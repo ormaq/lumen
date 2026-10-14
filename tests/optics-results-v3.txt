@@ -1,0 +1,116 @@
+
+> lumen-optics-studio@3.0.0 check
+> npm run format:check && npm run build && npm test
+
+
+> lumen-optics-studio@3.0.0 format:check
+> prettier --check src tests/*.mjs benchmarks/*.mjs build.mjs index.html package.json .prettierrc.json
+
+Checking formatting...
+All matched files use Prettier code style!
+
+> lumen-optics-studio@3.0.0 build
+> node build.mjs
+
+Built 291 KB offline app.
+
+> lumen-optics-studio@3.0.0 test
+> node --test tests/*.test.mjs
+
+✔ Bundling supports multiline aliased imports and keeps module scopes private (6.3538ms)
+✔ Shared dependencies execute exactly once and named exports remain callable (4.2805ms)
+✔ Broken or unsupported module imports fail at build time (9.0067ms)
+✔ Circular module imports fail clearly instead of recursing indefinitely (2.0952ms)
+✔ Offline distribution embeds styles and executable app/worker without placeholders (54.2993ms)
+✔ Bundled worker returns the same optical results and reports request revisions/errors (97.2943ms)
+✔ 18 usable component types, including eight sources (0.7695ms)
+✔ Orthonormal, right-handed bases at arbitrary 3D rotations (1.2278ms)
+✔ Stable linear, quadratic, tangent and no-root intersections (0.5064ms)
+✔ Reflection normalizes and obeys equal angles in 3D (0.4263ms)
+✔ Finite, two-sided plane bounds and parallel misses (0.3718ms)
+✔ Every paraboloid sample reflects through the exact focus (3.337ms)
+✔ Analytical paraboloid works with arbitrary yaw, tilt and roll (0.1378ms)
+✔ Paraboloid aperture clips rays beyond its physical rim (0.0675ms)
+✔ Parabolic collimator turns a focus source into a parallel beam (0.5061ms)
+✔ Trough has a line focus, not a false point focus (0.8095ms)
+✔ Spherical cap rejects the opposite half of the sphere (0.1181ms)
+✔ Spherical aberration is real, not an ideal point-focus approximation (0.286ms)
+✔ Convex spherical mirror diverges incoming parallel rays (0.0773ms)
+✔ All source types produce finite unit directions and conserve source power (1.0166ms)
+✔ Point source covers both hemispheres in true 3D (0.1722ms)
+✔ Fan source stays in its rolled emission plane (0.0895ms)
+✔ Spot rays stay inside their specified solid-angle cone (0.0831ms)
+✔ Ray density scales count but not total emitted power (0.1391ms)
+✔ RGB and wavelength colors remain source-specific (0.2114ms)
+✔ A 50:50 splitter conserves power in both detector branches (0.4411ms)
+✔ Splitter endpoints of 0 and 1 create no phantom branch (0.8475ms)
+✔ Detector power does not change when source sampling density changes (0.5391ms)
+✔ Pass-through detector continues rays while absorbing detector stops them (0.1636ms)
+✔ Blockers absorb; apertures transmit only through the actual opening (0.1109ms)
+✔ Ideal converging lens focuses collimated rays at the paraxial focus (0.35ms)
+✔ Negative thin-lens focal length diverges light (0.2892ms)
+✔ Snell refraction matches the sine law (0.293ms)
+✔ Total internal reflection returns no transmitted ray (0.0785ms)
+✔ Unpolarized Fresnel coefficient is 4% for air/glass at normal incidence (0.0607ms)
+✔ Glass sphere has correct entrance and exit intersections (0.0606ms)
+✔ Refraction through both sphere faces reaches the detector (0.4727ms)
+✔ Fresnel branching and total internal reflection work in the tracer (0.1708ms)
+✔ Three-dimensional mirror relay records three reflections per ray (0.2307ms)
+✔ Disabled components and zero-power sources do not participate (0.2192ms)
+✔ Ray path and segment budget limits are enforced (0.3513ms)
+✔ All presets round-trip through scene validation (22.5356ms)
+✔ Validation rejects malformed data and bounds unsupported geometry (0.283ms)
+✔ Version 1 scenes migrate with their original source directions (0.1567ms)
+✔ Aiming a source and world-boundary exits are consistent (0.112ms)
+✔ source color conversion stays constant as sampling grows, with independent ray colors (5.9693ms)
+✔ a lens resolves its frame once per trace, including after its orientation changes (11.9913ms)
+✔ nearest-hit pruning agrees with unrestricted intersections for every surface type (19.6796ms)
+✔ distance pruning preserves the strict path limit and stable ordering of coincident surfaces (0.2198ms)
+✔ large off-path scenes preserve all trace results and refresh moved surfaces (18.9963ms)
+✔ Display budgeting preserves complete ray paths and leaves traced data untouched (10.9897ms)
+✔ Source isolation and interaction filtering affect only the visible paths (12.9959ms)
+✔ Selecting a source dims other sources without changing colors or ray samples (28.1364ms)
+✔ Glow ribbons and camera-parallel paths produce finite geometry (0.7905ms)
+✔ Display output is deterministic for a camera and handles empty or hidden scenes (0.6ms)
+✔ 120 unchanged frames reuse camera matrices and allocate each stream only once (3.0809ms)
+✔ stream reuse preserves edits, grows for larger batches, and draws only active vertices (1.3075ms)
+✔ line uploads observe in-place edits without stale trailing vertices (0.5938ms)
+✔ empty overlays do not compile batch shaders, upload, allocate, or draw (0.7243ms)
+✔ camera cache invalidates for every control, in-place target edits, and viewport dimensions (0.536ms)
+✔ perspective and orthographic pointer rays project back to their screen coordinates (0.7536ms)
+✔ resize caps pixel density and keeps collapsed canvas projections finite (0.314ms)
+✔ normal matrices preserve perpendiculars under rotation and non-uniform scale (0.4961ms)
+✔ Positions preserve ±1,000,000 world units in scene round-trips (3.4196ms)
+✔ The tracer works far outside the former 22-by-26 world boundary (2.0651ms)
+✔ Long optical paths are not prematurely cut by fixed world bounds (0.2012ms)
+✔ Per-source density grows to 16,384 samples without changing power (10.6285ms)
+✔ Global ray budget is fair, finite and power-normalized per source (61.5342ms)
+✔ 100,000-segment ceiling cannot be bypassed by scene input (0.4882ms)
+✔ Persistent aim follows the target and the source in all three dimensions (0.222ms)
+✔ Removing an aim target releases the link and retains orientation (0.0934ms)
+✔ Coincident target centers do not generate invalid orientation (0.099ms)
+✔ Scene validation remaps arbitrary object IDs and target references together (0.2051ms)
+✔ Self links and unknown links release; duplicate IDs are rejected (0.3273ms)
+✔ Copying a group remaps internal aim links to the copied target (0.2203ms)
+✔ Single source paste preserves external target only in its own scene (0.1069ms)
+✔ Paste in place retains every coordinate and optical property (0.1754ms)
+✔ Clipboard validation rejects malformed, over-limit and NaN payloads (0.1083ms)
+✔ A point star emits parallel rays at a specified angular field (0.5477ms)
+✔ On-axis stellar rays form a geometric point on the virtual focal plane (5.7008ms)
+✔ Off-axis star produces coma without launch-plane sampling vignetting (3.5108ms)
+✔ Moving a target-locked star launch plane does not move its pupil or focal spot (10.1897ms)
+✔ Finite star disk has a finite angular extent and geometric focal footprint (2.45ms)
+✔ Double-star scene records both independent colored sources (6.3684ms)
+✔ Detector encounter gate distinguishes a virtual image plane from a physical blocker (3.0716ms)
+✔ Weighted spot statistics calculate centroid, RMS and 80% encircled radius (0.2341ms)
+✔ Telescope scaling converts focal length, plate scale and Airy reference consistently (0.1619ms)
+✔ Version 2 scenes import into version 3 without altering optical geometry (0.3271ms)
+✔ Source aim locks and telescope settings survive JSON round trips (0.179ms)
+ℹ tests 89
+ℹ suites 0
+ℹ pass 89
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 230.1947

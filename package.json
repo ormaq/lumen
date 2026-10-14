@@ -1,0 +1,22 @@
+{
+  "name": "lumen-optics-studio",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Offline fullscreen 3D geometric optics workbench",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "benchmark": "node benchmarks/optics.mjs",
+    "format": "prettier --write src tests/*.mjs benchmarks/*.mjs build.mjs index.html package.json .prettierrc.json",
+    "format:check": "prettier --check src tests/*.mjs benchmarks/*.mjs build.mjs index.html package.json .prettierrc.json",
+    "check": "npm run format:check && npm run build && npm test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "acorn": "8.15.0",
+    "prettier": "3.9.6"
+  }
+}

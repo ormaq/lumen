@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#0d141e" />
+    <meta
+      name="description"
+      content="Lumen: a self-contained, full-window 3D optics studio. Build and explore colored light, parabolic mirrors, lenses and more."
+    />
+    <title>Lumen 3 — 3D optics studio</title>
+    <style>
+      /*__STYLES__*/
+    </style>
+  </head>
+  <body class="left-hidden">
+    <div class="shell" id="app">
+      <header class="topbar" aria-label="Main toolbar">
+        <div class="brand">
+          <svg viewBox="0 0 30 30" aria-hidden="true">
+            <path d="M4 6l11 9L4 24M15 15l10-4M15 15l10 9M15 3v12" />
+            <circle cx="15" cy="15" r="2.5" fill="currentColor" stroke="none" /></svg
+          ><b>lumen</b><span class="version">3</span>
+        </div>
+        <details class="menu">
+          <summary>File</summary>
+          <div class="menu-pop">
+            <button id="new-button"><span data-icon="plus"></span>New scene</button
+            ><button id="load-button"><span data-icon="folder"></span>Open scene…</button
+            ><button id="save-button">
+              <span data-icon="save"></span>Save scene <kbd>⌘/Ctrl S</kbd></button
+            ><button id="screenshot-button"><span data-icon="camera"></span>Export image</button>
+            <hr />
+            <button id="examples-button"><span data-icon="layers"></span>Example scenes</button
+            ><button id="guide-button"><span data-icon="help"></span>Help & shortcuts</button>
+          </div>
+        </details>
+        <details class="menu">
+          <summary>Edit</summary>
+          <div class="menu-pop">
+            <button id="undo-button"><span data-icon="undo"></span>Undo <kbd>⌘/Ctrl Z</kbd></button
+            ><button id="redo-button"><span data-icon="redo"></span>Redo <kbd>⇧ Z</kbd></button>
+            <hr />
+            <button id="copy-button"><span data-icon="copy"></span>Copy <kbd>⌘/Ctrl C</kbd></button
+            ><button id="cut-button"><span data-icon="cut"></span>Cut <kbd>⌘/Ctrl X</kbd></button
+            ><button id="paste-button">
+              <span data-icon="clipboard"></span>Paste <kbd>⌘/Ctrl V</kbd></button
+            ><button id="paste-in-place">
+              <span data-icon="clipboard"></span>Paste in place <kbd>⇧ V</kbd></button
+            ><button id="duplicate-button">
+              <span data-icon="copy"></span>Duplicate <kbd>⌘/Ctrl D</kbd></button
+            ><button id="select-all">Select all <kbd>⌘/Ctrl A</kbd></button
+            ><button id="delete-selection"><span data-icon="trash"></span>Delete</button>
+          </div>
+        </details>
+        <span class="divider main-divider"></span>
+        <button
+          id="add-button"
+          class="primary"
+          title="Add component (A)"
+          aria-label="Add component"
+        >
+          <span data-icon="plus"></span><span class="add-label">Add</span>
+        </button>
+        <div class="tool-group" aria-label="Transform tools">
+          <button
+            class="mode-button active"
+            data-mode="select"
+            title="Select / orbit (Q)"
+            aria-label="Select tool"
+            aria-pressed="true"
+          >
+            <span data-icon="cursor"></span><span class="mode-label">Select</span></button
+          ><button class="mode-button" data-mode="move" title="Move (G)" aria-label="Move tool">
+            <span data-icon="move"></span><span class="mode-label">Move</span></button
+          ><button
+            class="mode-button"
+            data-mode="rotate"
+            title="Rotate (R)"
+            aria-label="Rotate tool"
+          >
+            <span data-icon="rotate"></span><span class="mode-label">Rotate</span>
+          </button>
+        </div>
+        <span class="spacer"></span
+        ><span id="project-name" class="scene-name">Parabolic focus</span>
+        <button
+          id="star-lab-button"
+          class="star-lab-button"
+          title="Telescope experiments"
+          aria-label="Open Star lab"
+        >
+          <span data-icon="star"></span><span>Star lab</span>
+        </button>
+        <details class="menu view-menu">
+          <summary><span data-icon="sliders"></span><span class="view-label">View</span></summary>
+          <div class="menu-pop">
+            <div class="menu-caption">CAMERA</div>
+            <div class="view-options">
+              <button data-view="3d" class="active">3D</button><button data-view="top">Top</button
+              ><button data-view="front">Front</button><button data-view="side">Side</button>
+            </div>
+            <button id="frame-button">
+              <span data-icon="frame"></span>Frame scene <kbd>Home</kbd></button
+            ><button id="frame-selection"><span data-icon="crosshair"></span>Frame selected</button>
+            <hr />
+            <button id="grid-button" class="active"><span data-icon="grid"></span>World grid</button
+            ><button id="foci-button" class="active">
+              <span data-icon="crosshair"></span>Focal markers</button
+            ><button id="normals-button"><span data-icon="normal"></span>Surface normals</button
+            ><button id="flow-menu-button"><span data-icon="play"></span>Animate light flow</button
+            ><button id="view-settings">
+              <span data-icon="sliders"></span>Ray display & simulation
+            </button>
+            <hr />
+            <div class="menu-caption">TRANSFORM</div>
+            <div class="axis-options">
+              <button data-axis="x">X</button><button data-axis="y">Y</button
+              ><button data-axis="z">Z</button
+              ><button id="snap-button" title="0.25 units / 15°">
+                <span data-icon="magnet"></span>Snap
+              </button>
+            </div>
+            <hr />
+            <button id="focus-button">
+              <span data-icon="focus"></span>Hide interface <kbd>Tab</kbd>
+            </button>
+          </div>
+        </details>
+        <div class="panel-toggles">
+          <button
+            id="left-toggle"
+            class="icon"
+            title="Objects & components"
+            aria-label="Toggle scene panel"
+          >
+            <span data-icon="panel-left"></span></button
+          ><button id="right-toggle" class="icon" title="Inspector" aria-label="Toggle inspector">
+            <span data-icon="panel-right"></span>
+          </button>
+        </div>
+        <button
+          id="fullscreen-button"
+          class="icon"
+          title="Fullscreen (F)"
+          aria-label="Toggle browser fullscreen"
+        >
+          <span data-icon="fullscreen"></span>
+        </button>
+      </header>
+      <main class="workspace">
+        <aside class="dock left-dock" id="left-dock" aria-label="Scene objects and components">
+          <div class="dock-tabs">
+            <button data-left-tab="scene" class="active">
+              Scene <span class="count" id="object-count">02</span></button
+            ><button data-left-tab="library">Components</button
+            ><button class="icon mobile-close" id="left-close" aria-label="Close scene panel">
+              <span data-icon="close"></span>
+            </button>
+          </div>
+          <div class="left-content" id="scene-panel">
+            <div class="scene-tree scroll">
+              <div class="panel-header">
+                <span class="eyebrow">OBJECTS</span
+                ><button
+                  id="duplicate-scene"
+                  class="icon"
+                  title="Duplicate selected (Ctrl/⌘ D)"
+                  aria-label="Duplicate selected"
+                >
+                  <span data-icon="copy"></span>
+                </button>
+              </div>
+              <div class="object-list" id="object-list"></div>
+              <button class="add-object" id="add-object">
+                <span data-icon="plus"></span>Add component
+              </button>
+            </div>
+            <section class="experiments">
+              <div class="experiments-head">
+                <span class="eyebrow">START EXPLORING</span
+                ><button id="all-examples">View all ↗</button>
+              </div>
+              <div id="quick-examples"></div>
+            </section>
+            <div class="dock-foot" id="scene-foot">2 objects · 1 light source</div>
+          </div>
+          <div class="left-content" id="library-panel" hidden>
+            <div class="searchbox">
+              <span data-icon="search"></span
+              ><input
+                id="component-search"
+                type="search"
+                placeholder="Find a component…"
+                aria-label="Find a component"
+              />
+            </div>
+            <div class="library scroll" id="library"></div>
+            <div class="dock-foot">Click to add · drag onto the grid</div>
+          </div>
+        </aside>
+        <section class="stage" id="stage" aria-label="Interactive 3D optical scene">
+          <canvas
+            id="canvas"
+            tabindex="0"
+            aria-label="3D optics viewport. Left drag to orbit, right drag to pan, scroll to zoom. Select objects and edit them in the inspector."
+          ></canvas>
+          <div class="stage-info">
+            <div class="overline" id="view-caption">3D OPTICS WORKSPACE</div>
+            <h1 id="scene-title">Parabolic focus</h1>
+            <p id="scene-subtitle">Parallel rays meet at a true 3D focus.</p>
+          </div>
+          <div class="live" hidden><i></i><span id="live-label">LIVE TRACE</span></div>
+          <div class="stage-stats" hidden id="stage-stats"></div>
+
+          <div class="labels" id="labels"></div>
+          <div class="measure" id="measure"></div>
+          <div class="viewport-bottom" id="mode-hint">
+            Drag to orbit · Right-drag to pan · Scroll to zoom
+          </div>
+          <div class="viewport-controls">
+            <button id="viewport-frame" title="Frame scene (Home)" aria-label="Frame scene">
+              <span data-icon="frame"></span></button
+            ><button
+              id="play-button"
+              title="Animate light flow (Space)"
+              aria-label="Animate light flow"
+            >
+              <span data-icon="play"></span></button
+            ><span class="viewport-chip" id="view-chip">Perspective</span>
+          </div>
+          <div class="axis-widget">
+            <svg
+              viewBox="0 0 80 80"
+              id="axis-svg"
+              role="img"
+              aria-label="World axes; click X, Y, Z to change view"
+            ></svg>
+          </div>
+          <div class="empty-stage" id="empty-stage" hidden>
+            <h2>Make room for an idea.</h2>
+            <p>Add a light source, place a mirror,<br />and see where the light goes.</p>
+            <button class="primary" id="empty-add">
+              <span data-icon="plus"></span>Add your first component
+            </button>
+          </div>
+          <div class="drop-indicator">Place component</div>
+          <div class="loading" id="loading">
+            <div><strong>Opening the optics studio.</strong>Starting the local 3D renderer…</div>
+          </div>
+        </section>
+        <aside
+          class="dock right-dock"
+          id="right-dock"
+          aria-label="Inspector and simulation settings"
+        >
+          <div class="dock-tabs">
+            <button class="active" data-right-tab="object">Object</button
+            ><button data-right-tab="simulation">View</button
+            ><button data-right-tab="research">Analysis</button
+            ><button class="icon mobile-close" id="right-close" aria-label="Close inspector">
+              <span data-icon="close"></span>
+            </button>
+          </div>
+          <div class="inspector-scroll scroll" id="inspector"></div>
+          <div class="inspector-scroll scroll" id="simulation-panel" hidden></div>
+          <div class="inspector-scroll scroll" id="research-panel" hidden></div>
+          <div class="inspector-footer">
+            <i></i><span id="save-status">Changes saved on this device</span>
+          </div>
+        </aside>
+      </main>
+      <footer class="statusbar">
+        <span id="status-trace"><span class="state-dot"></span>Ready</span
+        ><span id="status-pick" class="hide-small">Select an object to inspect</span
+        ><span class="spacer"></span
+        ><span class="hide-small" id="status-units">Geometric optics</span
+        ><button id="status-help" title="Keyboard shortcuts">? &nbsp; Shortcuts</button>
+      </footer>
+    </div>
+    <button class="focus-exit" id="focus-exit">
+      <span data-icon="panel-left"></span>Show interface <kbd>Tab</kbd>
+    </button>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <input id="scene-file" type="file" accept=".json,application/json" hidden />
+    <dialog id="star-dialog" class="star-dialog">
+      <div class="dialog-head">
+        <div>
+          <div class="star-kicker">TELESCOPE WORKBENCH</div>
+          <h2>A laboratory for starlight.</h2>
+          <p>
+            Illuminate your optics with a distant star, then inspect the geometric image at the
+            focal plane.
+          </p>
+        </div>
+        <button class="icon" data-close="star-dialog" aria-label="Close Star lab">
+          <span data-icon="close"></span>
+        </button>
+      </div>
+      <div class="dialog-content">
+        <div class="star-cards">
+          <button class="star-card" data-preset="star">
+            <span data-icon="star"></span>
+            <h3>Star at infinity</h3>
+            <p>On-axis, collimated light.<br />Start with an ideal parabolic primary.</p>
+            <span class="star-start">Open experiment →</span>
+          </button>
+          <button class="star-card" data-preset="coma">
+            <span data-icon="spark"></span>
+            <h3>Off-axis star</h3>
+            <p>Change the field angle.<br />Explore geometric coma.</p>
+            <span class="star-start">Open experiment →</span>
+          </button>
+          <button class="star-card" data-preset="binary">
+            <span data-icon="sun"></span>
+            <h3>Double-star field</h3>
+            <p>Two independent star sources.<br />Inspect their focal separation.</p>
+            <span class="star-start">Open experiment →</span>
+          </button>
+        </div>
+        <div class="star-tools">
+          <button id="add-star-current" class="bordered">
+            <span data-icon="plus"></span>Add a star to this scene</button
+          ><button id="analyze-current" class="bordered">
+            <span data-icon="detector"></span>Analyze current scene
+          </button>
+        </div>
+        <p class="note">
+          Experiments replace the scene; Undo restores your work. The focal plane is a virtual
+          analysis screen that samples reflected rays, not a physical obstruction. Diffraction and
+          atmospheric seeing are not simulated; the Airy circle is a reference only.
+        </p>
+      </div>
+    </dialog>
+    <dialog id="examples-dialog" class="examples-dialog">
+      <div class="dialog-head">
+        <div>
+          <h2>A starting point for every idea.</h2>
+          <p>
+            Load an experiment, then make it your own. Your current scene remains available in Undo.
+          </p>
+        </div>
+        <button class="icon" data-close="examples-dialog" aria-label="Close examples">
+          <span data-icon="close"></span>
+        </button>
+      </div>
+      <div class="dialog-content examples-grid" id="examples-grid"></div>
+    </dialog>
+    <dialog id="guide-dialog" class="guide-dialog">
+      <div class="dialog-head">
+        <div>
+          <h2>A workbench for light.</h2>
+          <p>Lumen 3 · Offline, three-dimensional geometric optics.</p>
+        </div>
+        <button class="icon" data-close="guide-dialog" aria-label="Close help">
+          <span data-icon="close"></span>
+        </button>
+      </div>
+      <div class="dialog-content">
+        <h3>Move through the scene</h3>
+        <div class="shortcut-grid">
+          <div class="shortcut">
+            <span>Orbit, like grabbing the scene</span><kbd>Left drag</kbd>
+          </div>
+          <div class="shortcut"><span>Pan the camera</span><kbd>Right / middle drag</kbd></div>
+          <div class="shortcut"><span>Pan with a trackpad</span><kbd>Shift + left drag</kbd></div>
+          <div class="shortcut"><span>Zoom</span><kbd>Wheel / pinch</kbd></div>
+          <div class="shortcut"><span>Frame an object</span><kbd>Double-click</kbd></div>
+          <div class="shortcut"><span>Frame the whole scene</span><kbd>Home</kbd></div>
+        </div>
+        <h3>Edit your experiment</h3>
+        <div class="shortcut-grid">
+          <div class="shortcut"><span>Select / move / rotate</span><kbd>Q / G / R</kbd></div>
+          <div class="shortcut"><span>Add components</span><kbd>A</kbd></div>
+          <div class="shortcut"><span>Axis constraint</span><kbd>X / Y / Z</kbd></div>
+          <div class="shortcut"><span>Change height while moving</span><kbd>Shift + drag</kbd></div>
+          <div class="shortcut"><span>Duplicate / delete</span><kbd>⌘/Ctrl D / Delete</kbd></div>
+          <div class="shortcut"><span>Undo / redo</span><kbd>⌘/Ctrl Z / Shift Z</kbd></div>
+          <div class="shortcut"><span>Pause light-flow dots</span><kbd>Space</kbd></div>
+          <div class="shortcut"><span>Save scene</span><kbd>⌘/Ctrl S</kbd></div>
+          <div class="shortcut"><span>3D / top / front / side</span><kbd>1 / 2 / 3 / 4</kbd></div>
+          <div class="shortcut"><span>Focus mode / fullscreen</span><kbd>Tab / F</kbd></div>
+        </div>
+        <p>
+          In Move mode, drag an object or its colored axis handles. Objects follow your cursor;
+          Shift changes height. In Rotate mode, drag to turn yaw and tilt; X/Y/Z constrain rotation
+          to a world axis. Enable snapping for 0.25-unit moves and 15° rotations. Touch: one finger
+          edits or orbits; two fingers pan and pinch.
+        </p>
+        <h3>Copy, paste & targeting</h3>
+        <p>
+          Use Ctrl/⌘ C, X and V to copy, cut and paste objects. Shift+V pastes in place. Shift-click
+          adds objects to the selection; Ctrl/⌘ A selects everything. Internal target locks are
+          preserved when copying a group. Clipboard fallback works inside Lumen when browser
+          clipboard access is unavailable. Text fields retain normal text-copy behavior.
+        </p>
+        <p>
+          In a source’s Emission section, “Aim once” sets a direction. “Lock onto” keeps the source
+          aimed at the target as either moves. Release the target lock to edit direction freely.
+          Transform locking is a separate control.
+        </p>
+        <h3>Star lab & density</h3>
+        <p>
+          A Distant star is a circular wavefront sampled from infinity. Field X/Y are angular
+          offsets from its base direction. Angular diameter samples a uniform apparent disk; it is
+          not atmospheric seeing. The Analysis tab includes geometric, power-weighted focal-spot
+          statistics, per-source centroids, optional Airy reference circles for an unobstructed
+          circular aperture, and CSV hit export. Define mm per world unit to set the telescope
+          scale.
+        </p>
+        <p>
+          Each source supports 16,384 rays; global density scales non-single sources up to that
+          per-source ceiling, with 65,536 emitted samples and 100,000 segments per scene. Sources
+          share the emitted-sample budget proportionally. Heavy traces run in a local worker when
+          supported. The viewport can sample complete ray paths independently of the full analysis;
+          its status shows any display thinning or trace truncation. Clear lines avoid additive
+          whiteout; selecting a source emphasizes its path. Dim other sources, adjust line opacity,
+          or switch to glow under View.
+        </p>
+        <h3>Built for the third dimension</h3>
+        <p>
+          Parabolic dishes have a point focus; troughs have a line focus. Curved mirrors use
+          analytical intersections and surface normals rather than flat mesh approximations. Sources
+          are independently colored and sampled in 3D. Splitters create two power-weighted branches.
+          Detector power is the sum of sampled incident ray powers, in arbitrary units.
+        </p>
+        <h3>What this simulation means</h3>
+        <p class="guide-note">
+          This is a geometric-optics teaching tool, not a full optical-design solver. Mirrors are
+          ideal and two-sided. Thin lenses use a paraxial approximation. A spherical mirror’s marked
+          focus is paraxial, not an exact focus. Glass spheres are surrounded by air: overlapping or
+          nested glass volumes are not supported. Fresnel reflection is optional per sphere; with it
+          off, ordinary surface reflection loss is omitted, while total internal reflection still
+          occurs.
+        </p>
+        <p>
+          Wavelength colors are a display approximation. RGB sources use 550 nm for glass
+          dispersion. There is no diffraction, interference, polarization, wave-optical PSF,
+          freeform glass, or physically calibrated color mixing. Grid, stands and emitter bodies are
+          decorative, not optical obstacles. Ray ends are clipped by the path-length limit, energy
+          threshold, interaction cap and performance budget. Positions span ±1,000,000 units on
+          every axis. Far-away geometry uses adaptive camera clipping; small details at extreme
+          coordinates may lose GPU precision. Animated dots illustrate direction, not the speed of
+          light.
+        </p>
+        <p>
+          Inspired by
+          <a href="https://phydemo.app/ray-optics/" target="_blank" rel="noopener noreferrer"
+            >PhyDemo Ray Optics Simulation</a
+          >. Reflection and refraction conventions follow
+          <a
+            href="https://pbr-book.org/4ed/Reflection_Models/Specular_Reflection_and_Transmission"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Physically Based Rendering</a
+          >. Lumen is an independent implementation, not a full 3D port.
+        </p>
+        <p>
+          Geometric spot-diagram interpretation follows
+          <a
+            href="https://optics.ansys.com/hc/en-us/articles/42661723066515-What-is-a-Point-Spread-Function"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Ansys: What is a Point Spread Function?</a
+          >
+          The Airy/Rayleigh reference is not a claim that this ray tracer resolves
+          diffraction-limited stars.
+        </p>
+      </div>
+      <div class="dialog-foot">
+        <button class="primary" data-close="guide-dialog">Back to the workbench</button>
+      </div>
+    </dialog>
+    <dialog id="confirm-dialog" class="confirm-dialog">
+      <div class="dialog-head">
+        <div>
+          <h2>Start a fresh scene?</h2>
+          <p>Your current scene will be kept in Undo.</p>
+        </div>
+      </div>
+      <div class="dialog-content">
+        <p>
+          Clear the workbench and build a new experiment from scratch. Save a JSON copy first to
+          keep it independently.
+        </p>
+      </div>
+      <div class="dialog-foot">
+        <button data-close="confirm-dialog" class="bordered">Cancel</button
+        ><button id="confirm-new" class="primary">New empty scene</button>
+      </div>
+    </dialog>
+    <script>
+      /*__APP__*/
+    </script>
+  </body>
+</html>

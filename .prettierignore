@@ -1,0 +1,5 @@
+node_modules/
+lumen-3d-v3.html
+tests/browser-results-v3.json
+tests/exported-*
+package-lock.json

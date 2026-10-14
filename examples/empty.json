@@ -1,0 +1,32 @@
+{
+  "version": 3,
+  "uid": "82376e7c-a911-4ae7-8cfb-c2f0b2b21c7f",
+  "name": "Empty workbench",
+  "preset": "empty",
+  "objects": [],
+  "settings": {
+    "maxBounces": 12,
+    "maxDistance": 30,
+    "density": 1,
+    "normals": false,
+    "grid": true,
+    "animate": false,
+    "labels": false,
+    "foci": true,
+    "glow": false,
+    "extensions": false,
+    "snap": false,
+    "starMode": false,
+    "mmPerUnit": 50,
+    "primaryId": null,
+    "detectorId": null,
+    "airyReference": true,
+    "spotAutoFit": true,
+    "rayStyle": "clarity",
+    "rayStage": "all",
+    "rayOpacity": 0.82,
+    "rayWidth": 1,
+    "displayBudget": 24000,
+    "showMeasurements": false
+  }
+}
