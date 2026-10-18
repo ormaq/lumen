@@ -1,6 +1,12 @@
 {
-  "version": 3,
-  "uid": "77737057-e5b7-491d-a443-f4b3421a46e3",
+  "version": 5,
+  "workspace": {
+    "camera": null,
+    "views": [],
+    "notes": "",
+    "monitor": false
+  },
+  "uid": "ba529241-f264-41e7-9d81-2928fb4211a3",
   "name": "A line of light",
   "preset": "trough",
   "objects": [
@@ -30,7 +36,8 @@
       "aperture": 1.2,
       "spread": 0,
       "width": 4.3,
-      "height": 3.6
+      "height": 3.6,
+      "aimDistance": 0
     },
     {
       "id": "o2",
@@ -69,12 +76,18 @@
     "density": 1,
     "normals": false,
     "grid": true,
-    "animate": false,
+    "animate": true,
     "labels": false,
     "foci": true,
     "glow": false,
     "extensions": false,
     "snap": false,
+    "hideStands": false,
+    "background": "studio",
+    "incidentOpacity": 1,
+    "spotCentroids": true,
+    "spotRms": false,
+    "analysisSourceId": null,
     "starMode": false,
     "mmPerUnit": 50,
     "primaryId": null,

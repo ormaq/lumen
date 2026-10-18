@@ -1,6 +1,12 @@
 {
-  "version": 3,
-  "uid": "17eead2e-1f5a-4d5d-91af-2f628ceb812e",
+  "version": 5,
+  "workspace": {
+    "camera": null,
+    "views": [],
+    "notes": "",
+    "monitor": true
+  },
+  "uid": "af90387e-7138-49f6-8d22-e1b6ea1126fa",
   "name": "Double-star field",
   "preset": "binary",
   "objects": [
@@ -11,13 +17,13 @@
       "enabled": true,
       "locked": false,
       "p": [
-        0,
-        144,
+        -24,
+        4,
         0
       ],
-      "yaw": 0,
-      "tilt": -90,
-      "roll": 0,
+      "yaw": 90,
+      "tilt": 0,
+      "roll": 90,
       "aimTarget": "o2",
       "fieldX": -0.08,
       "fieldY": 0,
@@ -30,7 +36,8 @@
       "aperture": 3.8,
       "spread": 0,
       "width": 3,
-      "height": 2
+      "height": 2,
+      "aimDistance": 24
     },
     {
       "id": "o2",
@@ -40,12 +47,12 @@
       "locked": false,
       "p": [
         0,
-        120,
+        4,
         0
       ],
-      "yaw": 0,
-      "tilt": 90,
-      "roll": 0,
+      "yaw": -90,
+      "tilt": 0,
+      "roll": 90,
       "width": 3,
       "height": 3,
       "diameter": 4,
@@ -69,13 +76,13 @@
       "enabled": true,
       "locked": false,
       "p": [
-        0,
-        132,
+        -12,
+        4,
         0
       ],
-      "yaw": 0,
-      "tilt": 90,
-      "roll": 0,
+      "yaw": -90,
+      "tilt": 0,
+      "roll": 90,
       "width": 1.5,
       "height": 1.5,
       "diameter": 4.8,
@@ -99,13 +106,13 @@
       "enabled": true,
       "locked": false,
       "p": [
-        0,
-        144,
+        -24,
+        4,
         0
       ],
-      "yaw": 0,
-      "tilt": -90,
-      "roll": 0,
+      "yaw": 90,
+      "tilt": 0,
+      "roll": 90,
       "aimTarget": "o2",
       "fieldX": 0.08,
       "fieldY": 0,
@@ -118,7 +125,8 @@
       "aperture": 3.8,
       "spread": 0,
       "width": 3,
-      "height": 2
+      "height": 2,
+      "aimDistance": 24
     }
   ],
   "settings": {
@@ -126,13 +134,19 @@
     "maxDistance": 60,
     "density": 1,
     "normals": false,
-    "grid": false,
-    "animate": false,
+    "grid": true,
+    "animate": true,
     "labels": false,
     "foci": true,
     "glow": false,
     "extensions": false,
     "snap": false,
+    "hideStands": true,
+    "background": "studio",
+    "incidentOpacity": 1,
+    "spotCentroids": true,
+    "spotRms": false,
+    "analysisSourceId": null,
     "starMode": true,
     "mmPerUnit": 50,
     "primaryId": "o2",

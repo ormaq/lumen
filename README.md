@@ -1,156 +1,108 @@
-# Lumen 3 — 3D Optics Studio
+# Lumen 5 — Optics Studio
 
-An offline 3D geometric-optics workbench with a single application toolbar, editable optical components, colored sources, and a telescope-oriented Star lab. This is an independent implementation inspired by PhyDemo's 2D Ray Optics Simulation, not a complete 3D port.
+A self-contained, full-window 3D geometric-optics workbench. This release gives Lumen a live start screen, integrates the former Star lab tools into the ordinary editor, and adds a few practical project and analysis tools. The V4 analytic inverse-mirror designer is retained.
 
-## Open the application
+## Open the app
 
-Open **`lumen-3d-v3.html`** in a WebGL-enabled browser. The file contains the entire application, renderer, optics kernel, styles and tracing worker. No installation, development server, external fonts, packages, account, or internet connection is required to run it. If a file viewer shows source text, save the HTML and open that saved copy in a browser.
+Open **`lumen-3d-v5.html`** in a modern WebGL-enabled browser. The bundled HTML contains its own code, styles, optics kernel, renderer, and worker source. It has no runtime libraries, network downloads, accounts, analytics, or cloud dependency. Browser security policies can disable WebGL, local storage, workers, downloads, or fullscreen; failures are reported where applicable.
 
-The workspace fills the browser viewport. **F** or the top-right icon requests actual browser fullscreen where supported; **Tab** with the canvas focused hides the interface without needing the Fullscreen API. This is a web application, not an operating-system-native executable.
+`index.html` is the same fully packaged application, ready for GitHub Pages or local use. The editable build template lives in `src/index.template.html`; rebuilding updates both HTML outputs.
 
-The scene autosaves locally when the browser permits localStorage. Private browsing and file-origin policies may limit persistence. **File → Save scene** produces a portable JSON copy. V1 and V2 scene files remain importable. Nothing is uploaded to a service.
+For GitHub Pages, commit the generated `index.html` and select the publishing branch and `/ (root)` folder under **Settings → Pages → Deploy from a branch**. No server or build step is required on GitHub Pages. Run `npm run build` and commit both generated HTML files whenever the source changes.
 
-## What's new
+## Your first session
 
-**A quieter, larger interface.** One 62-pixel toolbar contains File, Edit, Add, transform tools, Star lab, View and panel toggles. The library starts collapsed. Main controls use 14-pixel text; inspector headings and scene titles are larger. Orientation, color and secondary sections fold away. Floating measurements, all-object labels and animated dots are off by default. Mobile uses drawers and viewport-width menus instead of squeezing the canvas.
+The start screen offers six featured experiments: **Off-axis correction**, **Double-star field**, **Split & steer**, **RGB light lab**, **Through the glass**, and **Up & over**. Select a card to change the live, orbitable 3D preview. Drag to orbit; scroll to zoom. Pause motion or reset the camera using the preview controls. The inverse example has a real **Original / Corrected** geometry comparison.
 
-**Object clipboard.** Copy, cut, paste, paste in place, duplicate and multi-select work on objects or groups. Internal source-to-target links are remapped to the copied targets. A source copied alone keeps its external target when pasted within the same scene; cross-scene dangling targets are released. In-app copies paste immediately without a system-clipboard permission prompt; copying to the system clipboard is best-effort. With no local object clipboard, Paste tries the system clipboard when the browser permits it. Cross-tab/system clipboard availability is browser-dependent. Normal text-field shortcuts are not intercepted. Transform-locked objects cannot be cut or deleted.
+**Open experiment** loads the chosen experiment into the normal editor, with the full scene sampling—not the reduced preview sampling. Each launch creates a fresh project identity. The preview has its own scene, camera, trace, and renderer, so browsing examples does not modify an open project.
 
-**More room.** All three position axes accept **−1,000,000 to +1,000,000 world units**, including Y height. The tracer no longer clips paths to a small fixed world box. Camera framing, zoom, pan and clipping scale with the scene. Large positions do not automatically lengthen light paths: increase **View → Maximum path length** for long optical trains. Very small details at extreme absolute coordinates can lose GPU precision.
+**All experiments** exposes a searchable gallery of all 14 nonempty presets. **New blank project** starts with no optical objects and opens the component library. **Open project…** imports a saved scene. The Lumen logo returns to the start screen without replacing the current project; **Back to project** returns to editing.
 
-**Higher sampling.** A non-single source can emit **16,384 rays**, a scene can emit **65,536 rays**, and tracing stops at **100,000 segments**. Global density ranges from 0.25× to 8×, respecting those ceilings. Source power is normalized across its emitted samples. Over-subscribed sources share the scene sample budget proportionally. Heavy traces run in a local Blob worker where supported, with a synchronous fallback. Worker results from obsolete edits are discarded.
+The start screen appears by default. Uncheck **Show this screen on launch** to open the most recent valid recovery project on subsequent launches. With no recoverable project, the start screen still appears. Reduced-motion system preferences stop the preview's default motion.
 
-**Persistent targeting.** In a source's Emission section, choose an object and press **Lock onto**. Direction follows the target center when either source or target moves. **Aim once** remains a separate action. **Release lock** restores manual yaw/elevation control. This is an aiming link, distinct from transform locking. Removing the target releases the link while preserving the last direction.
+### The preview is a preview, not a second simulation mode
 
-**Clearer overlapping light.** Clear-lines mode uses non-additive alpha compositing, density-aware opacity and interleaved source drawing, rather than bright additive bloom by default. Selecting a source emphasizes its rays. **Only this source** isolates its visible paths without disabling other emitters. Soft-glow and by-bounce color modes, line opacity, width and an after-first-interaction filter are available. A lower visible-segment budget samples complete paths without changing the full traced detector data. The status bar reports display thinning, sample resampling and trace truncation separately. Display brightness is not calibrated irradiance.
+Preview rays are traced against the actual analytic surfaces with at most **97 emitted samples per source**, using one reusable secondary WebGL context. The flow markers and slow orbit are presentation, not light-speed timing or a moving optical system. The editor loads the normal higher-resolution source settings. Hidden previews stop drawing. There is no pre-rendered video or fabricated spot illustration.
 
-## Star lab: geometric telescope experiments
+## One workspace for every kind of light
 
-Choose **Star lab** in the toolbar. Three starting scenes are provided:
+There is no separate Star lab screen or telescope editing mode. **Add → Distant star** works in any scene, alongside lasers, parallel beams, point/spot sources, fans, line sources, and area emitters. Field angle, angular diameter, color, wavelength, density, power, and target locks live in the ordinary Object inspector.
 
-| Experiment | Purpose |
-| --- | --- |
-| Star at infinity | Parallel, on-axis starlight and an analytical parabolic primary |
-| Off-axis star | Change field angle and inspect geometric coma |
-| Double-star field | Two independent colored wavefronts and their focal spots |
+The launch gallery's on-axis, off-axis, and binary telescope examples are rotated into a horizontal lab layout. This is a rigid rotation of the previous geometry; the optics have not been changed. Earlier saved high-altitude telescope scenes retain their original layout when imported.
 
-These start at height 120 units, without the decorative floor grid or stands. Opening an experiment replaces the current scene but remains undoable. **Add a star to this scene** and **Analyze current scene** preserve your existing setup.
+**Analyze** in the single top toolbar opens the same detector Analysis panel for every scene. Any detector inspector also has an **Analyze detector** button. A normal splitter experiment and a star experiment therefore share exactly the same measurement tools.
 
-A **Distant star** source represents a circular sampled wavefront arriving from infinity, not a nearby point emitter. Its position places a finite launch plane; it is not the astronomical distance. **Field X/Y** specify angular offsets in degrees from its base direction. **Angular diameter** specifies a uniform apparent stellar disk in arcseconds; zero gives a point star with parallel rays. This disk is neither diffraction nor atmospheric seeing.
+### Detector analysis
 
-Lock a star onto the primary mirror to keep the sampled pupil centered on its vertex plane as field angle or launch distance changes. This compensates the launch-plane position for angular field, avoiding artificial vignetting caused just by moving that plane. Real finite mirror edges, apertures, blockers and path limits still affect the result. The wavefront diameter should cover the pupil you intend to sample.
+Choose the detector and either all sources or an individual source. The panel shows the recorded geometric hit diagram, incident power in arbitrary units, and per-source power-weighted RMS radius, 80% radius, and centroid. The source filter affects analysis and exports, not the scene's emission or tracing.
 
-The **Analysis** tab provides:
+Use **Pin live monitor** to keep a compact plot in the viewport while editing a source or mirror in Object. Click the plot or **Expand** for a larger live view. Close the monitor when it is not useful; it is optional and its state is saved per project.
 
-- A geometric spot diagram with separate source colors, centroids, power-weighted RMS radius and an 80%-encircled-power radius.
-- Recorded-sample and incident-power totals, detector/primary selection, full-screen or auto-fit plot extent, and full-hit CSV export.
-- Physical scale in millimeters per world unit; nominal aperture, focal length, focal ratio and plate scale.
-- An optional Airy-circle overlay and a 550 nm Rayleigh reference; source-specific circles use the selected wavelength, or 550 nm for RGB sources.
-- A focal-plane offset and **Place at nominal focus** command. These align the detector to the primary axis; use ordinary transforms for folded optical trains.
+Export a **Hits CSV** containing every recorded sample in the chosen source filter, or a **1200 × 920 Plot PNG** with the detector name, sample count, scale, and geometric-optics caveat. Exports wait for the current trace. The plot can show per-source centroids and RMS circles. Display-only source isolation and ray thinning do not throw away detector measurements.
 
-The included focal detector is an explicit **virtual analysis plane**: its **Record after interactions** value is 1, so incoming starlight passes it without being recorded or blocked. Reflected rays are then recorded and absorbed. Setting the value to 0 makes it a normal physical screen that also intercepts incoming light within its finite area. This gate is an analysis convenience, not a real telescope component or a model of secondary-mirror obscuration.
+Fold-out sections hold **Plot & display**, **Telescope & physical scale**, and **Focal-plane placement**. Physical scaling, nominal primary focus, aperture/focal-ratio/plate-scale references, and Airy reference circles are available wherever the selected optical element supports them. Arbitrary inverse reflectors do not receive misleading nominal on-axis telescope references. The focus-placement shortcut aligns the detector to the primary axis; it does not solve a folded multi-element system.
 
-CSV columns are `source`, `ray_index`, `u_world`, `v_world`, `u_mm`, `v_mm`, `x_world`, `y_world`, `z_world`, `power_arb`, `wavelength_nm`, and `interactions`. Radii are calculated around each source's own power-weighted centroid. Pass-through detectors may count repeated encounters, so their power is not automatically an efficiency percentage. A truncation warning means statistics may be incomplete; lower sampling/interaction limits and test convergence before interpreting them.
+A spot diagram contains geometric ray hits, not a diffraction point-spread function. Vignetting and numerical sampling limits can bias a spot measurement, so read the capture counts and explicit trace-limit notices as well as its RMS.
 
-### Scientific boundaries
+## Project and navigation conveniences
 
-The star workbench is useful for reproducible **geometric** experiments, not a validated production telescope-design solver. It does not propagate waves or calculate a diffraction PSF, interference, atmospheric seeing, detector pixels, polarization, stellar spectra/magnitudes or a material-calibrated throughput. A finite ray spot must not be mistaken for a wave-optical PSF. The Airy/Rayleigh circles are reference calculations for an unobstructed circular aperture, not simulated resolution or evidence that two stars can be resolved by a real instrument.
+**Project name & notes.** Click the project title or use File → Project name & notes. Names and notes are included in the JSON and local recovery data.
 
-For a primary of diameter D and nominal focal length f, in consistent length units:
+**Local recents.** The app keeps recovery copies of up to eight distinct projects where browser storage is available, including camera, named views, analysis filters, notes, and monitor state. Recent cards can reopen or remove a copy; removing requires confirmation. Opening a preview alone never creates or replaces a recovery project. Storage is local to the browser/location/profile, is not encrypted by the app, and can be cleared or denied. **Save scene** produces the portable JSON backup. Do not treat local recovery as durable archival storage.
 
-```
-f-number              = |f| / D
-plate scale [arcsec/mm] = 206264.806247 / |f_mm|
-Rayleigh angle [rad]    = 1.22 * wavelength / D
-Airy radius [length]    = 1.22 * wavelength * |f| / D
-```
+**Named camera views.** View → Save this camera view records the target, orbit, zoom, and projection. Recall or remove views in the View menu. Up to eight views are saved with a project.
 
-These reference formulas do not account for an obstruction, aberrations or optical trains downstream of the selected primary. The supplied 50 mm/world-unit scale makes the default primary 200 mm in diameter with a 600 mm nominal focal length, f/3.
+**Command search.** Press **Ctrl/Cmd+K** or the search button to find components, analysis tools, scene objects, project actions, and saved camera views. Arrow keys select a result; Enter executes; Escape closes. Native copy/paste and selection inside text fields remain native.
 
-## Controls
+**Independent display options.** The View inspector offers Studio, Midnight, and Slate backgrounds, a separate incoming-ray opacity, and optional component stands. These are ordinary scene settings, no longer hidden telescope-mode behaviors. The existing clarity/glow/bounce colors, path-stage display, flow motion, grid, normals, focus markers, and ray display budget remain available.
 
-| Action | Control |
-| --- | --- |
-| Orbit | Left drag in Select mode; foreground follows horizontal drag |
-| Pan | Right/middle drag; Shift + left drag in Select mode |
-| Zoom | Wheel; two-finger pinch on touch devices |
-| Frame scene / selected | Home / double-click; View menu |
-| Perspective / top / front / side | 1 / 2 / 3 / 4 |
-| Select / move / rotate | Q / G / R |
-| Axis constraint | X / Y / Z |
-| Raise/lower object | Y handle, Y position field, or Shift-drag in Move mode |
-| Multi-select | Shift-click objects in the scene list or viewport |
-| Select all | Ctrl/Command + A, outside text fields |
-| Copy / cut / paste | Ctrl/Command + C / X / V |
-| Paste in place | Ctrl/Command + Shift + V |
-| Duplicate / delete | Ctrl/Command + D / Delete |
-| Undo / redo | Ctrl/Command + Z / Shift + Z |
-| Add / save | A / Ctrl/Command + S |
-| Light-flow dots | Space |
-| Canvas-only / browser fullscreen | Tab with canvas focused / F |
-| Help | ? |
+## Navigation and editing
 
-Move selected groups together; rotation edits the active object. Snapping uses 0.25-unit translations and 15-degree rotations. The editor supports 80 components and 100 undo transactions. Load, paste, cut, new-scene and completed drags are undoable. An invert-horizontal-orbit preference remains under View.
+Left drag orbits with the corrected grab-style direction; right/middle drag pans; the wheel zooms. Move and Rotate expose object handles. Hold Shift while moving for height, or constrain with X/Y/Z. Coordinates support ±1,000,000 world units on all axes. Use Home to frame the scene after large moves; also raise maximum path length for long optical layouts.
 
-## Retained optics
+Shift-click selects groups. Ctrl/Cmd+C, X, V copy, cut, and paste. Ctrl/Cmd+Shift+V pastes in place. Ctrl/Cmd+D duplicates. Undo/redo preserve the existing single-transaction edits and remap copied source/target locks appropriately. Transform locks prevent accidental movement/deletion. Source **Aim once** and persistent **Lock onto** remain separate controls.
 
-There are **18 component types**: eight sources (single ray, beam, point, spot, fan, line, area, distant star); four mirrors (flat, parabolic dish, parabolic trough, spherical concave/convex); splitters, ideal thin lenses and glass spheres; blockers, apertures and detectors. Sources have independent RGB or wavelength colors and power. All ten earlier presets remain, for a total of thirteen including the empty workbench.
+Keys 1–4 select perspective, top, front, and side cameras; the three axial views are orthographic. **F** requests browser fullscreen. **Tab**, with the viewport focused, hides the interface. Mobile uses slide-out panels, touch orbit, and pinch navigation.
 
-Surfaces use analytical intersections and normals rather than the display mesh. In a reflector's local frame, a dish is `z=(x²+y²)/(4f)` and a trough is `z=x²/(4f)`. Coordinates are right-handed with Y up; local +Z points into the bowl and along a source's base direction. Mirror reflectivity and splitter power ratios are adjustable. A spherical mirror's R/2 marker is paraxial, not an exact common focus.
+## Inverse mirror shaping
 
-Glass spheres implement Snell refraction, total internal reflection, optional unpolarized Fresnel branches and a simple optional dispersion model in surrounding air. RGB sources use 550 nm for dispersion. Overlapping/nested glass volumes are unsupported. Thin lenses are ideal paraxial elements, not real curved glass. Mirrors are ideal and two-sided. Decorative supports, emitter bodies and the grid do not interact optically. Animated dots show direction, not the speed of light. Wavelength colors and RGB mixing are illustrative.
+Open **Shape**, choose a mirror, a design source, and a detector, then select the detector-local target and choose **Auto-shape mirror**. A parallel design wavefront produces an off-axis paraboloid; a finite design source point produces an ellipsoid. Reflection is computed from the actual analytic surface normal. The solver does not artificially aim outgoing rays after intersection.
 
-## Source and tests
+The original figure, fixed mount frame, before/after aperture audit, same-scale comparison, capture accounting, frozen/live geometry distinction, target picking, undo, and sag CSV / OBJ exports are retained. **Original / Corrected on the start screen** chooses the figure that opens; **View original / View current in Shape** remains a non-destructive comparison.
 
-The source uses consistent two-space formatting and keeps presentation helpers separate from the editor and mathematical kernel. Edit these source files, then rebuild the standalone HTML:
+See **`docs/V4-inverse-design-guide.md`** for the full retained mathematical formulation, audit definitions, supported-source assumptions, and fabrication caveats. That guide describes the prior UI; its geometric solver discussion still applies. Open the V5 file, not the V4 filename mentioned in the historical guide.
 
-| File | Responsibility |
-| --- | --- |
-| `index.html` | Application markup and bundle placeholders |
-| `src/styles.css` | Theme, controls, panels, and responsive layouts |
-| `src/ui.js` | Shared icons and DOM helpers |
-| `src/app.js` | Editor state, history, controls, workers, and analysis |
-| `src/ray-display.js` | Pure ray-display filtering and ribbon geometry |
-| `src/renderer.js` | WebGL meshes, reusable upload buffers, and camera |
-| `src/optics.js` | Deterministic optics, sampling, validation, and presets |
-| `build.mjs` | Parsed local-module bundler and worker assembly |
-| `tests/*.test.mjs` | Optics, performance, renderer, display, and bundle regressions |
-| `tests/browser_v3.py` | Real browser controls, layout, worker, and export regressions |
-| `benchmarks/optics.mjs` | Reproducible trace timings and optional baseline comparison |
-| `examples/*.json` | Thirteen editable scenes |
-| `lumen-3d-v3.html` | Generated, ready-to-open offline application |
+This is a **one-design-point inverse solver**, not a full-field image optimizer. A second star or an extended source continues to encounter the same physical mirror surface and can remain aberrated. Surface exports are open optical surfaces, not complete mirror blanks or machining plans.
 
-With Node.js 18 or later:
+## Limits and compatibility
+
+The retained kernel supports 19 component types, up to 80 scene objects, up to 16,384 samples per source, 65,536 emitted rays per scene, and 100,000 traced segments. The global density multiplier reaches 8×. Source/scene/segment caps are explicit. A separate viewport budget thins complete displayed paths rather than reducing detector sampling. Dense traces use a local Blob worker where permitted, with a synchronous fallback.
+
+V1–V4 scenes are imported and normalized to the V5 schema. The legacy `starMode` field is retained for compatibility only; it no longer controls the editor interface or special beam brightness. Old star scenes migrate their stand visibility to `hideStands`. V5 workspace metadata is validated and optional. Existing source locks and inverse-design bindings remain ID-remapped during validation/copy-paste.
+
+The workbench uses geometric optics: no diffraction, interference, atmospheric seeing, physical detector pixels, calibrated irradiance display, polarization, tolerances, roughness, or manufacturing simulation. Thin lenses are paraxial; wavelength colors are approximate; overlapping glass volumes are unsupported. Flow markers are illustrative. This is an experimental educational/design workbench, not a validated production telescope or fabrication solver.
+
+## Build and test
+
+Requires Node.js 18 or newer to rebuild; the built app itself does not require Node.
 
 ```sh
-npm ci
-npm run check
+node build.mjs
+node --test tests/*.test.mjs
 ```
 
-`check` verifies formatting, rebuilds the distribution, and runs the tests. Run `npm run format` to format source changes, `npm run build` to regenerate the HTML, `npm test` for regressions, and `npm run benchmark` for performance measurements. If PowerShell blocks `npm.ps1`, use `npm.cmd` for these commands.
+Performance checks compare the current implementation with saved pre-optimization V5 source, including exact optical-output comparisons and browser pixel checks. Run `npm run test:performance` for the tracing benchmark and `npm run test:browser-performance` for browser upload, rendering, worker and mobile checks. See [performance results and reproduction instructions](benchmarks/README.md) for measured improvements, dependencies and limitations.
 
-Acorn and Prettier are pinned development dependencies. The bundled application still requires no installation, external packages, or network access. The build resolves local named imports, preserves module scopes, and rejects missing exports and circular dependencies. Rebuild before running tests after source edits: the bundle test also checks that the ready-to-open HTML matches the sources.
-
-There are **89 automated tests** covering optical results and power conservation, imports, worker parity, display sampling, projection, mutable GPU uploads, and avoided repeat work. Performance tests assert operation/allocation counts instead of unstable timing thresholds. Local benchmark medians improved by 20-68% for star, binary-star, lens, and crowded 80-object scenes; Fresnel glass was unchanged. Methodology and recorded timings are in [benchmarks/README.md](benchmarks/README.md).
-
-Display-only controls reuse the existing optical trace, including an in-flight worker result. Optical geometry, source sampling, density, and path limits still request a fresh trace. The renderer reuses buffer capacity and unchanged camera matrices; the kernel avoids unnecessary temporary vectors, rejected hit records, and repeated source/frame calculations.
-
-The optional browser suite uses Python and Playwright. It discovers a local Chrome/Edge/Chromium or uses a Playwright-installed Chromium:
+Browser checks use Python Playwright, Pillow, Chromium, and Xvfb on headless Linux. They require no runtime web assets:
 
 ```sh
-python -m pip install playwright
-python -m playwright install chromium
-python -u tests/browser_v3.py
+xvfb-run -a python -u tests/browser_studio_v5.py
+xvfb-run -a python -u tests/browser_inverse_v5.py
+xvfb-run -a python -u tests/browser_regression_v5.py
 ```
 
-The browser download is unnecessary when a supported browser is already installed. `CHROMIUM_PATH` selects an executable explicitly; `BROWSER_HEADLESS=0` enables a visible browser, and `BROWSER_OUTPUT_DIR` redirects reports, downloads, and screenshots. Headed Linux runs need a display or `xvfb-run`.
+Set `CHROMIUM_PATH` when Chromium is not at `/usr/bin/chromium`. See `VERIFICATION.md` for the actual tested environment, coverage, results, and limitations—including the distinction between a storage test model and real browser persistence.
 
-The final headless Edge run passed **147 browser checks** with no desktop/mobile application errors or external requests. See `tests/browser-results-v3.json` and `.log` for the recorded checks. The harness injects the bundled document with `page.set_content` and drives the DOM, keyboard, mouse, touch drawers, fullscreen, workers, imports, CSV/JSON/PNG downloads, and responsive layouts. It also verifies that display changes keep recorded optical data intact without retracing, while optical edits do retrace. A held worker response checks that display edits during a dense trace do not discard valid results. Coverage includes Chromium desktop and touch viewports; Safari/Firefox, real mobile GPUs, cross-app clipboard permissions, and file-origin persistence are not covered.
+### Source map
 
-`window.Lumen` exposes read-only snapshots via `getScene()`, `getTrace()`, `getCamera()`, `getStats()`, `getSelection()`, `getSelections()`, and `getHistory()`, plus pure helpers in `kernel`. `getStats().pending` includes worker work; `traceRuns` counts actual synchronous traces or worker dispatches; `renderedSegments` can be lower than traced `segments`. Imported JSON validates finite values, types, IDs, and references; files are limited to 2 MB. Saved scenes use `{version:3, uid, name, preset, objects, settings}`.
-
-## References
-
-The workbench/component baseline is [PhyDemo Ray Optics Simulation](https://phydemo.app/ray-optics/). Reflection and transmission conventions follow [Physically Based Rendering, 4th edition](https://pbr-book.org/4ed/Reflection_Models/Specular_Reflection_and_Transmission). Geometric spot interpretation and its distinction from a diffraction PSF are explained in [Ansys: What is a Point Spread Function?](https://optics.ansys.com/hc/en-us/articles/42661723066515-What-is-a-Point-Spread-Function). The circular-aperture Rayleigh criterion is also described in [ESA's diffraction-limit research brief](https://www.esa.int/gsp/ACT/doc/ARI/ARI%20Call%20doc/Study%20descriptions/ARI-study_17-1501.pdf).
-
-Lumen is not affiliated with these projects and makes no runtime requests to them.
+`src/optics.js` holds the pure geometry, tracing, validation, and inverse kernel. `renderer.js` is the dependency-free WebGL renderer. `designer.js` is the inverse-design interface. `app.js` owns the editor. `session.js` validates local project recovery, `preview.js` builds isolated real-ray demo previews, and `launcher.js` owns the start screen and command search. `studio.css` contains the new UI styling. `build.mjs` embeds them into `src/index.template.html` and writes identical offline bundles to `index.html` and `lumen-3d-v5.html`, creating the worker source from the same kernel.

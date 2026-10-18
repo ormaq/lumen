@@ -1,6 +1,12 @@
 {
-  "version": 3,
-  "uid": "b0ed3dd1-08a8-438d-afa6-4decdc8e8c71",
+  "version": 5,
+  "workspace": {
+    "camera": null,
+    "views": [],
+    "notes": "",
+    "monitor": false
+  },
+  "uid": "329d2b9c-92c0-4ead-a501-8ce0d1f9e1fb",
   "name": "Parabolic focus",
   "preset": "focus",
   "objects": [
@@ -30,7 +36,8 @@
       "aperture": 4,
       "spread": 0,
       "width": 3,
-      "height": 2
+      "height": 2,
+      "aimDistance": 0
     },
     {
       "id": "o2",
@@ -69,12 +76,18 @@
     "density": 1,
     "normals": false,
     "grid": true,
-    "animate": false,
+    "animate": true,
     "labels": false,
     "foci": true,
     "glow": false,
     "extensions": false,
     "snap": false,
+    "hideStands": false,
+    "background": "studio",
+    "incidentOpacity": 1,
+    "spotCentroids": true,
+    "spotRms": false,
+    "analysisSourceId": null,
     "starMode": false,
     "mmPerUnit": 50,
     "primaryId": null,

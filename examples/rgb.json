@@ -1,6 +1,12 @@
 {
-  "version": 3,
-  "uid": "f5945b51-501f-4e84-bdc4-00a8c8aa7c8f",
+  "version": 5,
+  "workspace": {
+    "camera": null,
+    "views": [],
+    "notes": "",
+    "monitor": false
+  },
+  "uid": "50927406-c012-42ba-9dc3-58e2ffca6cc0",
   "name": "RGB light lab",
   "preset": "rgb",
   "objects": [
@@ -30,7 +36,8 @@
       "aperture": 0.45,
       "spread": 0,
       "width": 3,
-      "height": 2
+      "height": 2,
+      "aimDistance": 0
     },
     {
       "id": "o2",
@@ -58,7 +65,8 @@
       "aperture": 0.45,
       "spread": 0,
       "width": 3,
-      "height": 2
+      "height": 2,
+      "aimDistance": 0
     },
     {
       "id": "o3",
@@ -86,7 +94,8 @@
       "aperture": 0.45,
       "spread": 0,
       "width": 3,
-      "height": 2
+      "height": 2,
+      "aimDistance": 0
     },
     {
       "id": "o4",
@@ -125,12 +134,18 @@
     "density": 1,
     "normals": false,
     "grid": true,
-    "animate": false,
+    "animate": true,
     "labels": false,
     "foci": true,
     "glow": false,
     "extensions": false,
     "snap": false,
+    "hideStands": false,
+    "background": "studio",
+    "incidentOpacity": 1,
+    "spotCentroids": true,
+    "spotRms": false,
+    "analysisSourceId": null,
     "starMode": false,
     "mmPerUnit": 50,
     "primaryId": null,

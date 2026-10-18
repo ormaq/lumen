@@ -1,6 +1,12 @@
 {
-  "version": 3,
-  "uid": "387018b2-79a9-4b52-b36f-75bbe390eb18",
+  "version": 5,
+  "workspace": {
+    "camera": null,
+    "views": [],
+    "notes": "",
+    "monitor": false
+  },
+  "uid": "6806e682-5793-4205-8f32-f3aafcced7e7",
   "name": "Split & steer",
   "preset": "splitter",
   "objects": [
@@ -30,7 +36,8 @@
       "aperture": 0.55,
       "spread": 0,
       "width": 3,
-      "height": 2
+      "height": 2,
+      "aimDistance": 0
     },
     {
       "id": "o2",
@@ -129,12 +136,18 @@
     "density": 1,
     "normals": false,
     "grid": true,
-    "animate": false,
+    "animate": true,
     "labels": false,
     "foci": true,
     "glow": false,
     "extensions": false,
     "snap": false,
+    "hideStands": false,
+    "background": "studio",
+    "incidentOpacity": 1,
+    "spotCentroids": true,
+    "spotRms": false,
+    "analysisSourceId": null,
     "starMode": false,
     "mmPerUnit": 50,
     "primaryId": null,

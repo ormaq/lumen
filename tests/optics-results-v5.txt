@@ -1,0 +1,886 @@
+TAP version 13
+# Subtest: Inverse figure equals the ordinary parabola for on-axis focus
+ok 1 - Inverse figure equals the ordinary parabola for on-axis focus
+  ---
+  duration_ms: 21.636134
+  type: 'test'
+  ...
+# Subtest: Off-axis correction puts every probe on the target instead of a smear
+ok 2 - Off-axis correction puts every probe on the target instead of a smear
+  ---
+  duration_ms: 105.609167
+  type: 'test'
+  ...
+# Subtest: Actual forward tracer, not a steering override, records all corrected rays
+ok 3 - Actual forward tracer, not a steering override, records all corrected rays
+  ---
+  duration_ms: 66.50185
+  type: 'test'
+  ...
+# Subtest: Finite source creates an ellipsoid and retains a measurable source capture fraction
+ok 4 - Finite source creates an ellipsoid and retains a measurable source capture fraction
+  ---
+  duration_ms: 85.020422
+  type: 'test'
+  ...
+# Subtest: The mirror anchor, mount Euler angles, and all other objects stay fixed
+ok 5 - The mirror anchor, mount Euler angles, and all other objects stay fixed
+  ---
+  duration_ms: 2.427758
+  type: 'test'
+  ...
+# Subtest: A nonzero star field angle is used in the wavefront solve
+ok 6 - A nonzero star field angle is used in the wavefront solve
+  ---
+  duration_ms: 41.152773
+  type: 'test'
+  ...
+# Subtest: A tilted and rolled detector can use an off-center target in its local coordinates
+ok 7 - A tilted and rolled detector can use an off-center target in its local coordinates
+  ---
+  duration_ms: 85.133286
+  type: 'test'
+  ...
+# Subtest: Rotating the detector about the central target does not change the solved figure
+ok 8 - Rotating the detector about the central target does not change the solved figure
+  ---
+  duration_ms: 29.260221
+  type: 'test'
+  ...
+# Subtest: An extended star stays extended; the solver does not claim a point image
+ok 9 - An extended star stays extended; the solver does not claim a point image
+  ---
+  duration_ms: 89.779843
+  type: 'test'
+  ...
+# Subtest: A second source direction is reflected by the same geometry, not collapsed to the design target
+ok 10 - A second source direction is reflected by the same geometry, not collapsed to the design target
+  ---
+  duration_ms: 70.456544
+  type: 'test'
+  ...
+# Subtest: Inverse normal agrees with finite-difference derivatives of the actual sag
+ok 11 - Inverse normal agrees with finite-difference derivatives of the actual sag
+  ---
+  duration_ms: 20.10474
+  type: 'test'
+  ...
+# Subtest: Design rays obey reversibility at the solved surface
+ok 12 - Design rays obey reversibility at the solved surface
+  ---
+  duration_ms: 10.807181
+  type: 'test'
+  ...
+# Subtest: Only the chosen near-anchor ellipsoid patch is traced, never its far wall
+ok 13 - Only the chosen near-anchor ellipsoid patch is traced, never its far wall
+  ---
+  duration_ms: 1.918094
+  type: 'test'
+  ...
+# Subtest: The clear aperture rejects intersections outside its circular rim
+ok 14 - The clear aperture rejects intersections outside its circular rim
+  ---
+  duration_ms: 0.921911
+  type: 'test'
+  ...
+# Subtest: A near-axis quadratic handles perfectly axial ray intersections
+ok 15 - A near-axis quadratic handles perfectly axial ray intersections
+  ---
+  duration_ms: 0.391917
+  type: 'test'
+  ...
+# Subtest: Million-unit world coordinates retain a focused local figure
+ok 16 - Million-unit world coordinates retain a focused local figure
+  ---
+  duration_ms: 44.3754
+  type: 'test'
+  ...
+# Subtest: A frozen surface remains rigid and becomes stale when its detector moves
+ok 17 - A frozen surface remains rigid and becomes stale when its detector moves
+  ---
+  duration_ms: 63.875706
+  type: 'test'
+  ...
+# Subtest: Explicit live correction changes the stored surface and follows a moved target
+ok 18 - Explicit live correction changes the stored surface and follows a moved target
+  ---
+  duration_ms: 41.93257
+  type: 'test'
+  ...
+# Subtest: A failed live solve preserves the last valid surface and returns an error
+ok 19 - A failed live solve preserves the last valid surface and returns an error
+  ---
+  duration_ms: 2.854767
+  type: 'test'
+  ...
+# Subtest: Locked mirrors reject an explicit solve and do not live-reshape
+ok 20 - Locked mirrors reject an explicit solve and do not live-reshape
+  ---
+  duration_ms: 2.171763
+  type: 'test'
+  ...
+# Subtest: Invalid targets, dark sources and zero-distance geometry are rejected
+ok 21 - Invalid targets, dark sources and zero-distance geometry are rejected
+  ---
+  duration_ms: 0.47334
+  type: 'test'
+  ...
+# Subtest: Divergent distributed emitters are rejected instead of being treated as parallel light
+ok 22 - Divergent distributed emitters are rejected instead of being treated as parallel light
+  ---
+  duration_ms: 0.141261
+  type: 'test'
+  ...
+# Subtest: Planar fan source warns that it does not empirically sample a 3D aperture
+ok 23 - Planar fan source warns that it does not empirically sample a 3D aperture
+  ---
+  duration_ms: 1.098305
+  type: 'test'
+  ...
+# Subtest: Whole-aperture validation rejects a folded or grazing height field
+ok 24 - Whole-aperture validation rejects a folded or grazing height field
+  ---
+  duration_ms: 1.352256
+  type: 'test'
+  ...
+# Subtest: Degenerate straight-through ellipsoid is rejected
+ok 25 - Degenerate straight-through ellipsoid is rejected
+  ---
+  duration_ms: 0.377635
+  type: 'test'
+  ...
+# Subtest: Constant optical path is independently checked over both full apertures
+ok 26 - Constant optical path is independently checked over both full apertures
+  ---
+  duration_ms: 24.909658
+  type: 'test'
+  ...
+# Subtest: Blocking the input produces no metric, not a bogus zero-radius success
+ok 27 - Blocking the input produces no metric, not a bogus zero-radius success
+  ---
+  duration_ms: 26.611788
+  type: 'test'
+  ...
+# Subtest: Path limits and detector thresholds cannot hide zero throughput behind a small spot
+ok 28 - Path limits and detector thresholds cannot hide zero throughput behind a small spot
+  ---
+  duration_ms: 41.241225
+  type: 'test'
+  ...
+# Subtest: Missing the mirror returns null spot errors
+ok 29 - Missing the mirror returns null spot errors
+  ---
+  duration_ms: 10.984256
+  type: 'test'
+  ...
+# Subtest: The mirror audit does not discard rays outside a small detector to improve RMS
+ok 30 - The mirror audit does not discard rays outside a small detector to improve RMS
+  ---
+  duration_ms: 23.82895
+  type: 'test'
+  ...
+# Subtest: Reflectivity affects collected power, never the geometric surface solve
+ok 31 - Reflectivity affects collected power, never the geometric surface solve
+  ---
+  duration_ms: 33.145546
+  type: 'test'
+  ...
+# Subtest: Solved surfaces and bindings survive V5 scene serialization
+ok 32 - Solved surfaces and bindings survive V5 scene serialization
+  ---
+  duration_ms: 46.227015
+  type: 'test'
+  ...
+# Subtest: Stored surface normals and trace do not depend on source/target bindings
+ok 33 - Stored surface normals and trace do not depend on source/target bindings
+  ---
+  duration_ms: 49.396503
+  type: 'test'
+  ...
+# Subtest: Deleting a design target leaves a valid saved rigid surface
+ok 34 - Deleting a design target leaves a valid saved rigid surface
+  ---
+  duration_ms: 21.935692
+  type: 'test'
+  ...
+# Subtest: Group copy remaps both inverse bindings; pasted shapes start frozen
+ok 35 - Group copy remaps both inverse bindings; pasted shapes start frozen
+  ---
+  duration_ms: 5.238599
+  type: 'test'
+  ...
+# Subtest: Cross-scene mirror-only copy releases external design references
+ok 36 - Cross-scene mirror-only copy releases external design references
+  ---
+  duration_ms: 9.857588
+  type: 'test'
+  ...
+# Subtest: Restore original returns the true old parabola and preserves the current mount transform
+ok 37 - Restore original returns the true old parabola and preserves the current mount transform
+  ---
+  duration_ms: 1.47528
+  type: 'test'
+  ...
+# Subtest: Malicious or nonfinite serialized figures cannot enter the renderer
+ok 38 - Malicious or nonfinite serialized figures cannot enter the renderer
+  ---
+  duration_ms: 2.188859
+  type: 'test'
+  ...
+# Subtest: Directly added inverse reflector is a valid default analytic surface
+ok 39 - Directly added inverse reflector is a valid default analytic surface
+  ---
+  duration_ms: 7.714697
+  type: 'test'
+  ...
+# Subtest: Surface export has finite points, unit normals and a connected circular triangulation
+ok 40 - Surface export has finite points, unit normals and a connected circular triangulation
+  ---
+  duration_ms: 19.650188
+  type: 'test'
+  ...
+# Subtest: An arbitrary inverse reflector does not inherit an invalid on-axis Airy reference
+ok 41 - An arbitrary inverse reflector does not inherit an invalid on-axis Airy reference
+  ---
+  duration_ms: 2.242109
+  type: 'test'
+  ...
+# Subtest: Rectangular mirror conversion reports an inscribed circular aperture
+ok 42 - Rectangular mirror conversion reports an inscribed circular aperture
+  ---
+  duration_ms: 2.04925
+  type: 'test'
+  ...
+# Subtest: Randomized non-axis-aligned point and plane wave geometries focus across the entire aperture
+ok 43 - Randomized non-axis-aligned point and plane wave geometries focus across the entire aperture
+  ---
+  duration_ms: 66.425395
+  type: 'test'
+  ...
+# Subtest: Sampled sag bounds include interior extrema, not just rim and anchor
+ok 44 - Sampled sag bounds include interior extrema, not just rim and anchor
+  ---
+  duration_ms: 1.851684
+  type: 'test'
+  ...
+# Subtest: Far-away focus does not weaken the source-direction stale tolerance
+ok 45 - Far-away focus does not weaken the source-direction stale tolerance
+  ---
+  duration_ms: 5.255814
+  type: 'test'
+  ...
+# Subtest: Imported original-surface metadata cannot restore a zero-focus or invalid spherical cap
+ok 46 - Imported original-surface metadata cannot restore a zero-focus or invalid spherical cap
+  ---
+  duration_ms: 7.268329
+  type: 'test'
+  ...
+# Subtest: 19 usable component types, including eight sources
+ok 47 - 19 usable component types, including eight sources
+  ---
+  duration_ms: 1.315781
+  type: 'test'
+  ...
+# Subtest: Orthonormal, right-handed bases at arbitrary 3D rotations
+ok 48 - Orthonormal, right-handed bases at arbitrary 3D rotations
+  ---
+  duration_ms: 2.343391
+  type: 'test'
+  ...
+# Subtest: Stable linear, quadratic, tangent and no-root intersections
+ok 49 - Stable linear, quadratic, tangent and no-root intersections
+  ---
+  duration_ms: 0.6672
+  type: 'test'
+  ...
+# Subtest: Reflection normalizes and obeys equal angles in 3D
+ok 50 - Reflection normalizes and obeys equal angles in 3D
+  ---
+  duration_ms: 1.255071
+  type: 'test'
+  ...
+# Subtest: Finite, two-sided plane bounds and parallel misses
+ok 51 - Finite, two-sided plane bounds and parallel misses
+  ---
+  duration_ms: 0.369193
+  type: 'test'
+  ...
+# Subtest: Every paraboloid sample reflects through the exact focus
+ok 52 - Every paraboloid sample reflects through the exact focus
+  ---
+  duration_ms: 4.350408
+  type: 'test'
+  ...
+# Subtest: Analytical paraboloid works with arbitrary yaw, tilt and roll
+ok 53 - Analytical paraboloid works with arbitrary yaw, tilt and roll
+  ---
+  duration_ms: 0.293279
+  type: 'test'
+  ...
+# Subtest: Paraboloid aperture clips rays beyond its physical rim
+ok 54 - Paraboloid aperture clips rays beyond its physical rim
+  ---
+  duration_ms: 0.131467
+  type: 'test'
+  ...
+# Subtest: Parabolic collimator turns a focus source into a parallel beam
+ok 55 - Parabolic collimator turns a focus source into a parallel beam
+  ---
+  duration_ms: 1.779385
+  type: 'test'
+  ...
+# Subtest: Trough has a line focus, not a false point focus
+ok 56 - Trough has a line focus, not a false point focus
+  ---
+  duration_ms: 1.785184
+  type: 'test'
+  ...
+# Subtest: Spherical cap rejects the opposite half of the sphere
+ok 57 - Spherical cap rejects the opposite half of the sphere
+  ---
+  duration_ms: 0.189744
+  type: 'test'
+  ...
+# Subtest: Spherical aberration is real, not an ideal point-focus approximation
+ok 58 - Spherical aberration is real, not an ideal point-focus approximation
+  ---
+  duration_ms: 0.601871
+  type: 'test'
+  ...
+# Subtest: Convex spherical mirror diverges incoming parallel rays
+ok 59 - Convex spherical mirror diverges incoming parallel rays
+  ---
+  duration_ms: 0.156274
+  type: 'test'
+  ...
+# Subtest: All source types produce finite unit directions and conserve source power
+ok 60 - All source types produce finite unit directions and conserve source power
+  ---
+  duration_ms: 2.353396
+  type: 'test'
+  ...
+# Subtest: Point source covers both hemispheres in true 3D
+ok 61 - Point source covers both hemispheres in true 3D
+  ---
+  duration_ms: 0.456094
+  type: 'test'
+  ...
+# Subtest: Fan source stays in its rolled emission plane
+ok 62 - Fan source stays in its rolled emission plane
+  ---
+  duration_ms: 0.283715
+  type: 'test'
+  ...
+# Subtest: Spot rays stay inside their specified solid-angle cone
+ok 63 - Spot rays stay inside their specified solid-angle cone
+  ---
+  duration_ms: 0.304637
+  type: 'test'
+  ...
+# Subtest: Ray density scales count but not total emitted power
+ok 64 - Ray density scales count but not total emitted power
+  ---
+  duration_ms: 0.652869
+  type: 'test'
+  ...
+# Subtest: RGB and wavelength colors remain source-specific
+ok 65 - RGB and wavelength colors remain source-specific
+  ---
+  duration_ms: 0.362583
+  type: 'test'
+  ...
+# Subtest: A 50:50 splitter conserves power in both detector branches
+ok 66 - A 50:50 splitter conserves power in both detector branches
+  ---
+  duration_ms: 0.601922
+  type: 'test'
+  ...
+# Subtest: Splitter endpoints of 0 and 1 create no phantom branch
+ok 67 - Splitter endpoints of 0 and 1 create no phantom branch
+  ---
+  duration_ms: 0.806388
+  type: 'test'
+  ...
+# Subtest: Detector power does not change when source sampling density changes
+ok 68 - Detector power does not change when source sampling density changes
+  ---
+  duration_ms: 0.709243
+  type: 'test'
+  ...
+# Subtest: Pass-through detector continues rays while absorbing detector stops them
+ok 69 - Pass-through detector continues rays while absorbing detector stops them
+  ---
+  duration_ms: 0.336735
+  type: 'test'
+  ...
+# Subtest: Blockers absorb; apertures transmit only through the actual opening
+ok 70 - Blockers absorb; apertures transmit only through the actual opening
+  ---
+  duration_ms: 0.191947
+  type: 'test'
+  ...
+# Subtest: Ideal converging lens focuses collimated rays at the paraxial focus
+ok 71 - Ideal converging lens focuses collimated rays at the paraxial focus
+  ---
+  duration_ms: 2.586676
+  type: 'test'
+  ...
+# Subtest: Negative thin-lens focal length diverges light
+ok 72 - Negative thin-lens focal length diverges light
+  ---
+  duration_ms: 1.056032
+  type: 'test'
+  ...
+# Subtest: Snell refraction matches the sine law
+ok 73 - Snell refraction matches the sine law
+  ---
+  duration_ms: 0.121773
+  type: 'test'
+  ...
+# Subtest: Total internal reflection returns no transmitted ray
+ok 74 - Total internal reflection returns no transmitted ray
+  ---
+  duration_ms: 0.069123
+  type: 'test'
+  ...
+# Subtest: Unpolarized Fresnel coefficient is 4% for air/glass at normal incidence
+ok 75 - Unpolarized Fresnel coefficient is 4% for air/glass at normal incidence
+  ---
+  duration_ms: 0.564926
+  type: 'test'
+  ...
+# Subtest: Glass sphere has correct entrance and exit intersections
+ok 76 - Glass sphere has correct entrance and exit intersections
+  ---
+  duration_ms: 0.178838
+  type: 'test'
+  ...
+# Subtest: Refraction through both sphere faces reaches the detector
+ok 77 - Refraction through both sphere faces reaches the detector
+  ---
+  duration_ms: 1.707057
+  type: 'test'
+  ...
+# Subtest: Fresnel branching and total internal reflection work in the tracer
+ok 78 - Fresnel branching and total internal reflection work in the tracer
+  ---
+  duration_ms: 0.332748
+  type: 'test'
+  ...
+# Subtest: Three-dimensional mirror relay records three reflections per ray
+ok 79 - Three-dimensional mirror relay records three reflections per ray
+  ---
+  duration_ms: 0.412298
+  type: 'test'
+  ...
+# Subtest: Disabled components and zero-power sources do not participate
+ok 80 - Disabled components and zero-power sources do not participate
+  ---
+  duration_ms: 0.252549
+  type: 'test'
+  ...
+# Subtest: Ray path and segment budget limits are enforced
+ok 81 - Ray path and segment budget limits are enforced
+  ---
+  duration_ms: 0.405767
+  type: 'test'
+  ...
+# Subtest: All presets round-trip through scene validation
+ok 82 - All presets round-trip through scene validation
+  ---
+  duration_ms: 195.735715
+  type: 'test'
+  ...
+# Subtest: Validation rejects malformed data and bounds unsupported geometry
+ok 83 - Validation rejects malformed data and bounds unsupported geometry
+  ---
+  duration_ms: 0.636113
+  type: 'test'
+  ...
+# Subtest: Version 1 scenes migrate with their original source directions
+ok 84 - Version 1 scenes migrate with their original source directions
+  ---
+  duration_ms: 0.331506
+  type: 'test'
+  ...
+# Subtest: Aiming a source and world-boundary exits are consistent
+ok 85 - Aiming a source and world-boundary exits are consistent
+  ---
+  duration_ms: 0.224366
+  type: 'test'
+  ...
+# Subtest: All previous scene generations migrate to the unified workspace
+ok 86 - All previous scene generations migrate to the unified workspace
+  ---
+  duration_ms: 8.181427
+  type: 'test'
+  ...
+# Subtest: Stand visibility is independent of legacy star mode
+ok 87 - Stand visibility is independent of legacy star mode
+  ---
+  duration_ms: 0.805186
+  type: 'test'
+  ...
+# Subtest: Presentation settings cannot change physical tracing
+ok 88 - Presentation settings cannot change physical tracing
+  ---
+  duration_ms: 238.656075
+  type: 'test'
+  ...
+# Subtest: Validated workspace preserves camera, notes and monitor state
+ok 89 - Validated workspace preserves camera, notes and monitor state
+  ---
+  duration_ms: 0.433599
+  type: 'test'
+  ...
+# Subtest: Malformed or non-finite cameras are discarded without rejecting optics
+ok 90 - Malformed or non-finite cameras are discarded without rejecting optics
+  ---
+  duration_ms: 0.451016
+  type: 'test'
+  ...
+# Subtest: Camera validation clamps pathological finite positions and ranges
+ok 91 - Camera validation clamps pathological finite positions and ranges
+  ---
+  duration_ms: 0.208582
+  type: 'test'
+  ...
+# Subtest: View names and notes have bounded serialized sizes
+ok 92 - View names and notes have bounded serialized sizes
+  ---
+  duration_ms: 0.281421
+  type: 'test'
+  ...
+# Subtest: Invalid named views are individually ignored
+ok 93 - Invalid named views are individually ignored
+  ---
+  duration_ms: 0.134001
+  type: 'test'
+  ...
+# Subtest: Workspace metadata and display options survive project round-trip
+ok 94 - Workspace metadata and display options survive project round-trip
+  ---
+  duration_ms: 20.789937
+  type: 'test'
+  ...
+# Subtest: Unknown backgrounds and invalid source bindings are safely normalized
+ok 95 - Unknown backgrounds and invalid source bindings are safely normalized
+  ---
+  duration_ms: 0.441221
+  type: 'test'
+  ...
+# Subtest: Recovery store is empty and non-destructive at first launch
+ok 96 - Recovery store is empty and non-destructive at first launch
+  ---
+  duration_ms: 0.610384
+  type: 'test'
+  ...
+# Subtest: Recovery saves a complete validated project without mutating it
+ok 97 - Recovery saves a complete validated project without mutating it
+  ---
+  duration_ms: 0.475392
+  type: 'test'
+  ...
+# Subtest: Recovery maintains at most eight projects and most recent first
+ok 98 - Recovery maintains at most eight projects and most recent first
+  ---
+  duration_ms: 3.826322
+  type: 'test'
+  ...
+# Subtest: Editing an existing recovered project updates it rather than duplicating it
+ok 99 - Editing an existing recovered project updates it rather than duplicating it
+  ---
+  duration_ms: 0.626379
+  type: 'test'
+  ...
+# Subtest: Corrupt recovery records are skipped and raw markup is only scene text
+ok 100 - Corrupt recovery records are skipped and raw markup is only scene text
+  ---
+  duration_ms: 0.203956
+  type: 'test'
+  ...
+# Subtest: Invalid recovery JSON does not crash the store
+ok 101 - Invalid recovery JSON does not crash the store
+  ---
+  duration_ms: 0.220841
+  type: 'test'
+  ...
+# Subtest: Legacy recovery loads without immediately modifying stored work
+ok 102 - Legacy recovery loads without immediately modifying stored work
+  ---
+  duration_ms: 0.206509
+  type: 'test'
+  ...
+# Subtest: Deleting the last recent project does not resurrect legacy autosaves
+ok 103 - Deleting the last recent project does not resurrect legacy autosaves
+  ---
+  duration_ms: 0.258478
+  type: 'test'
+  ...
+# Subtest: Quota failure preserves the previous atomic recovery list
+ok 104 - Quota failure preserves the previous atomic recovery list
+  ---
+  duration_ms: 0.481531
+  type: 'test'
+  ...
+# Subtest: Unavailable storage is a safe optional feature
+ok 105 - Unavailable storage is a safe optional feature
+  ---
+  duration_ms: 0.182203
+  type: 'test'
+  ...
+# Subtest: Throwing browser storage getters are handled
+ok 106 - Throwing browser storage getters are handled
+  ---
+  duration_ms: 0.238146
+  type: 'test'
+  ...
+# Subtest: Malformed projects are not written into recovery
+ok 107 - Malformed projects are not written into recovery
+  ---
+  duration_ms: 0.09363
+  type: 'test'
+  ...
+# Subtest: Command search is case insensitive and matches all words across groups
+ok 108 - Command search is case insensitive and matches all words across groups
+  ---
+  duration_ms: 0.245959
+  type: 'test'
+  ...
+# Subtest: Command search preserves discovery order and caps long results
+ok 109 - Command search preserves discovery order and caps long results
+  ---
+  duration_ms: 0.115022
+  type: 'test'
+  ...
+# Subtest: Featured inverse demo traces actual paths and preserves full source density
+ok 110 - Featured inverse demo traces actual paths and preserves full source density
+  ---
+  duration_ms: 92.474651
+  type: 'test'
+  ...
+# Subtest: Featured binary demo traces actual paths and preserves full source density
+ok 111 - Featured binary demo traces actual paths and preserves full source density
+  ---
+  duration_ms: 48.837346
+  type: 'test'
+  ...
+# Subtest: Featured splitter demo traces actual paths and preserves full source density
+ok 112 - Featured splitter demo traces actual paths and preserves full source density
+  ---
+  duration_ms: 4.591659
+  type: 'test'
+  ...
+# Subtest: Featured rgb demo traces actual paths and preserves full source density
+ok 113 - Featured rgb demo traces actual paths and preserves full source density
+  ---
+  duration_ms: 0.744285
+  type: 'test'
+  ...
+# Subtest: Featured glass demo traces actual paths and preserves full source density
+ok 114 - Featured glass demo traces actual paths and preserves full source density
+  ---
+  duration_ms: 2.532634
+  type: 'test'
+  ...
+# Subtest: Featured relay demo traces actual paths and preserves full source density
+ok 115 - Featured relay demo traces actual paths and preserves full source density
+  ---
+  duration_ms: 0.76048
+  type: 'test'
+  ...
+# Subtest: Launch mirror comparison modifies the optical figure, not the layout
+ok 116 - Launch mirror comparison modifies the optical figure, not the layout
+  ---
+  duration_ms: 89.04351
+  type: 'test'
+  ...
+# Subtest: Integrated star telescope is a rigid rotation of the previous vertical example
+ok 117 - Integrated star telescope is a rigid rotation of the previous vertical example
+  ---
+  duration_ms: 67.698543
+  type: 'test'
+  ...
+# Subtest: Integrated coma telescope is a rigid rotation of the previous vertical example
+ok 118 - Integrated coma telescope is a rigid rotation of the previous vertical example
+  ---
+  duration_ms: 31.120072
+  type: 'test'
+  ...
+# Subtest: Integrated binary telescope is a rigid rotation of the previous vertical example
+ok 119 - Integrated binary telescope is a rigid rotation of the previous vertical example
+  ---
+  duration_ms: 79.980102
+  type: 'test'
+  ...
+# Subtest: Choosing and altering one demo cannot mutate another instance
+ok 120 - Choosing and altering one demo cannot mutate another instance
+  ---
+  duration_ms: 0.415402
+  type: 'test'
+  ...
+# Subtest: Positions preserve ±1,000,000 world units in scene round-trips
+ok 121 - Positions preserve ±1,000,000 world units in scene round-trips
+  ---
+  duration_ms: 5.925797
+  type: 'test'
+  ...
+# Subtest: The tracer works far outside the former 22-by-26 world boundary
+ok 122 - The tracer works far outside the former 22-by-26 world boundary
+  ---
+  duration_ms: 6.27455
+  type: 'test'
+  ...
+# Subtest: Long optical paths are not prematurely cut by fixed world bounds
+ok 123 - Long optical paths are not prematurely cut by fixed world bounds
+  ---
+  duration_ms: 0.491967
+  type: 'test'
+  ...
+# Subtest: Per-source density grows to 16,384 samples without changing power
+ok 124 - Per-source density grows to 16,384 samples without changing power
+  ---
+  duration_ms: 109.713045
+  type: 'test'
+  ...
+# Subtest: Global ray budget is fair, finite and power-normalized per source
+ok 125 - Global ray budget is fair, finite and power-normalized per source
+  ---
+  duration_ms: 356.195793
+  type: 'test'
+  ...
+# Subtest: 100,000-segment ceiling cannot be bypassed by scene input
+ok 126 - 100,000-segment ceiling cannot be bypassed by scene input
+  ---
+  duration_ms: 4.874914
+  type: 'test'
+  ...
+# Subtest: Persistent aim follows the target and the source in all three dimensions
+ok 127 - Persistent aim follows the target and the source in all three dimensions
+  ---
+  duration_ms: 0.400019
+  type: 'test'
+  ...
+# Subtest: Removing an aim target releases the link and retains orientation
+ok 128 - Removing an aim target releases the link and retains orientation
+  ---
+  duration_ms: 0.224626
+  type: 'test'
+  ...
+# Subtest: Coincident target centers do not generate invalid orientation
+ok 129 - Coincident target centers do not generate invalid orientation
+  ---
+  duration_ms: 0.376094
+  type: 'test'
+  ...
+# Subtest: Scene validation remaps arbitrary object IDs and target references together
+ok 130 - Scene validation remaps arbitrary object IDs and target references together
+  ---
+  duration_ms: 0.529663
+  type: 'test'
+  ...
+# Subtest: Self links and unknown links release; duplicate IDs are rejected
+ok 131 - Self links and unknown links release; duplicate IDs are rejected
+  ---
+  duration_ms: 0.521291
+  type: 'test'
+  ...
+# Subtest: Copying a group remaps internal aim links to the copied target
+ok 132 - Copying a group remaps internal aim links to the copied target
+  ---
+  duration_ms: 0.470575
+  type: 'test'
+  ...
+# Subtest: Single source paste preserves external target only in its own scene
+ok 133 - Single source paste preserves external target only in its own scene
+  ---
+  duration_ms: 0.34723
+  type: 'test'
+  ...
+# Subtest: Paste in place retains every coordinate and optical property
+ok 134 - Paste in place retains every coordinate and optical property
+  ---
+  duration_ms: 0.516894
+  type: 'test'
+  ...
+# Subtest: Clipboard validation rejects malformed, over-limit and NaN payloads
+ok 135 - Clipboard validation rejects malformed, over-limit and NaN payloads
+  ---
+  duration_ms: 0.190074
+  type: 'test'
+  ...
+# Subtest: A point star emits parallel rays at a specified angular field
+ok 136 - A point star emits parallel rays at a specified angular field
+  ---
+  duration_ms: 1.099037
+  type: 'test'
+  ...
+# Subtest: On-axis stellar rays form a geometric point on the virtual focal plane
+ok 137 - On-axis stellar rays form a geometric point on the virtual focal plane
+  ---
+  duration_ms: 16.358027
+  type: 'test'
+  ...
+# Subtest: Off-axis star produces coma without launch-plane sampling vignetting
+ok 138 - Off-axis star produces coma without launch-plane sampling vignetting
+  ---
+  duration_ms: 11.139098
+  type: 'test'
+  ...
+# Subtest: Moving a target-locked star launch plane does not move its pupil or focal spot
+ok 139 - Moving a target-locked star launch plane does not move its pupil or focal spot
+  ---
+  duration_ms: 44.592676
+  type: 'test'
+  ...
+# Subtest: Finite star disk has a finite angular extent and geometric focal footprint
+ok 140 - Finite star disk has a finite angular extent and geometric focal footprint
+  ---
+  duration_ms: 16.392358
+  type: 'test'
+  ...
+# Subtest: Double-star scene records both independent colored sources
+ok 141 - Double-star scene records both independent colored sources
+  ---
+  duration_ms: 23.100548
+  type: 'test'
+  ...
+# Subtest: Detector encounter gate distinguishes a virtual image plane from a physical blocker
+ok 142 - Detector encounter gate distinguishes a virtual image plane from a physical blocker
+  ---
+  duration_ms: 4.569766
+  type: 'test'
+  ...
+# Subtest: Weighted spot statistics calculate centroid, RMS and 80% encircled radius
+ok 143 - Weighted spot statistics calculate centroid, RMS and 80% encircled radius
+  ---
+  duration_ms: 0.188161
+  type: 'test'
+  ...
+# Subtest: Telescope scaling converts focal length, plate scale and Airy reference consistently
+ok 144 - Telescope scaling converts focal length, plate scale and Airy reference consistently
+  ---
+  duration_ms: 0.207802
+  type: 'test'
+  ...
+# Subtest: Version 2 scenes import into version 5 without altering optical geometry
+ok 145 - Version 2 scenes import into version 5 without altering optical geometry
+  ---
+  duration_ms: 0.45414
+  type: 'test'
+  ...
+# Subtest: Source aim locks and telescope settings survive JSON round trips
+ok 146 - Source aim locks and telescope settings survive JSON round trips
+  ---
+  duration_ms: 0.302974
+  type: 'test'
+  ...
+1..146
+# tests 146
+# suites 0
+# pass 146
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1310.304969

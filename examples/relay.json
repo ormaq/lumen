@@ -1,6 +1,12 @@
 {
-  "version": 3,
-  "uid": "5ffc7e5e-7955-4777-9426-aa8a335485ba",
+  "version": 5,
+  "workspace": {
+    "camera": null,
+    "views": [],
+    "notes": "",
+    "monitor": false
+  },
+  "uid": "c0479221-3648-4995-bd31-8180ba37b601",
   "name": "Up & over",
   "preset": "relay",
   "objects": [
@@ -30,7 +36,8 @@
       "aperture": 0.3,
       "spread": 0,
       "width": 3,
-      "height": 2
+      "height": 2,
+      "aimDistance": 0
     },
     {
       "id": "o2",
@@ -129,12 +136,18 @@
     "density": 1,
     "normals": false,
     "grid": true,
-    "animate": false,
+    "animate": true,
     "labels": false,
     "foci": true,
     "glow": false,
     "extensions": false,
     "snap": false,
+    "hideStands": false,
+    "background": "studio",
+    "incidentOpacity": 1,
+    "spotCentroids": true,
+    "spotRms": false,
+    "analysisSourceId": null,
     "starMode": false,
     "mmPerUnit": 50,
     "primaryId": null,

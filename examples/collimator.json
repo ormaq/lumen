@@ -1,6 +1,12 @@
 {
-  "version": 3,
-  "uid": "c23c7b02-3ef0-4549-a9fb-cfbbcf224856",
+  "version": 5,
+  "workspace": {
+    "camera": null,
+    "views": [],
+    "notes": "",
+    "monitor": false
+  },
+  "uid": "bdce2460-4825-4036-afed-4b31f8681b52",
   "name": "Point to parallel",
   "preset": "collimator",
   "objects": [
@@ -30,7 +36,8 @@
       "aperture": 1.2,
       "spread": 34,
       "width": 3,
-      "height": 2
+      "height": 2,
+      "aimDistance": 0
     },
     {
       "id": "o2",
@@ -69,12 +76,18 @@
     "density": 1,
     "normals": false,
     "grid": true,
-    "animate": false,
+    "animate": true,
     "labels": false,
     "foci": true,
     "glow": false,
     "extensions": false,
     "snap": false,
+    "hideStands": false,
+    "background": "studio",
+    "incidentOpacity": 1,
+    "spotCentroids": true,
+    "spotRms": false,
+    "analysisSourceId": null,
     "starMode": false,
     "mmPerUnit": 50,
     "primaryId": null,

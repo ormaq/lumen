@@ -1,0 +1,127 @@
+{
+  "browser": "155.0.4283.62",
+  "renderer": "ANGLE SwiftShader (software WebGL)",
+  "checks": [
+    "baseline launch preview boots",
+    "baseline clarity worker completed",
+    "baseline clarity worker matches synchronous kernel",
+    "baseline clarity paused workspace stops rendering",
+    "baseline glow worker completed",
+    "baseline glow worker matches synchronous kernel",
+    "baseline glow paused workspace stops rendering",
+    "baseline bounce worker completed",
+    "baseline bounce worker matches synchronous kernel",
+    "baseline bounce paused workspace stops rendering",
+    "baseline camera changes refresh ray geometry",
+    "baseline camera changes preserve optical output",
+    "baseline empty scene has no stale rays",
+    "baseline scene restores after clearing GPU cache",
+    "baseline real HTTP storage recovery",
+    "baseline no uncaught JS errors",
+    "baseline no external runtime assets",
+    "optimized launch preview boots",
+    "optimized clarity worker completed",
+    "optimized clarity worker matches synchronous kernel",
+    "optimized clarity paused workspace stops rendering",
+    "optimized glow worker completed",
+    "optimized glow worker matches synchronous kernel",
+    "optimized glow paused workspace stops rendering",
+    "optimized bounce worker completed",
+    "optimized bounce worker matches synchronous kernel",
+    "optimized bounce paused workspace stops rendering",
+    "optimized camera changes refresh ray geometry",
+    "optimized camera changes preserve optical output",
+    "optimized empty scene has no stale rays",
+    "optimized scene restores after clearing GPU cache",
+    "optimized real HTTP storage recovery",
+    "optimized no uncaught JS errors",
+    "optimized no external runtime assets",
+    "clarity pixels exactly match baseline",
+    "clarity avoids repeated large geometry uploads",
+    "clarity reduces upload bytes by at least 90%",
+    "glow pixels exactly match baseline",
+    "glow avoids repeated large geometry uploads",
+    "glow reduces upload bytes by at least 90%",
+    "bounce pixels exactly match baseline",
+    "bounce avoids repeated large geometry uploads",
+    "bounce reduces upload bytes by at least 90%",
+    "Complete browser traces match baseline",
+    "Mobile synchronous fallback traces without workers",
+    "Fallback detector output matches kernel",
+    "Mobile viewport has no horizontal overflow",
+    "No fallback errors"
+  ],
+  "passed": 48,
+  "results": {
+    "baseline": {
+      "modes": {
+        "clarity": {
+          "frames": 45,
+          "bytes": 125808768,
+          "uploads": 270,
+          "largeUploads": 45,
+          "medianCpuMs": 1.699999999254942,
+          "p95CpuMs": 2,
+          "bytesPerFrame": 2795750.4
+        },
+        "glow": {
+          "frames": 45,
+          "bytes": 249647616,
+          "uploads": 315,
+          "largeUploads": 90,
+          "medianCpuMs": 2.2000000001862645,
+          "p95CpuMs": 2.7000000001862645,
+          "bytesPerFrame": 5547724.8
+        },
+        "bounce": {
+          "frames": 45,
+          "bytes": 179914176,
+          "uploads": 315,
+          "largeUploads": 90,
+          "medianCpuMs": 1.8999999994412065,
+          "p95CpuMs": 2.300000000745058,
+          "bytesPerFrame": 3998092.8
+        }
+      },
+      "traceSha256": "dd27cf2fb1aac4fcee8e656cb2502afa80b50e6049e1261f4ed1c5ea6a8bdbc8",
+      "errors": []
+    },
+    "optimized": {
+      "modes": {
+        "clarity": {
+          "frames": 45,
+          "bytes": 1945728,
+          "uploads": 225,
+          "largeUploads": 0,
+          "medianCpuMs": 1.3999999994412065,
+          "p95CpuMs": 1.7999999998137355,
+          "bytesPerFrame": 43238.4
+        },
+        "glow": {
+          "frames": 45,
+          "bytes": 1939680,
+          "uploads": 225,
+          "largeUploads": 0,
+          "medianCpuMs": 1.599999999627471,
+          "p95CpuMs": 1.7999999998137355,
+          "bytesPerFrame": 43104.0
+        },
+        "bounce": {
+          "frames": 45,
+          "bytes": 1933632,
+          "uploads": 225,
+          "largeUploads": 0,
+          "medianCpuMs": 1.800000000745058,
+          "p95CpuMs": 2.2000000001862645,
+          "bytesPerFrame": 42969.6
+        }
+      },
+      "traceSha256": "dd27cf2fb1aac4fcee8e656cb2502afa80b50e6049e1261f4ed1c5ea6a8bdbc8",
+      "errors": []
+    }
+  },
+  "bundles": {
+    "baseline": "3335011d55726ef8eea62ad17c71bbed936414c616220f7c0fa238e2524d9559",
+    "optimized": "358316daa7d51c0c19fcdb88ce6124777e9ab14f93ffc18044f93241f311ca8e"
+  }
+}

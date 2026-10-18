@@ -1,6 +1,12 @@
 {
-  "version": 3,
-  "uid": "60d23104-40e1-4ae4-a53b-0ccd1784e2b1",
+  "version": 5,
+  "workspace": {
+    "camera": null,
+    "views": [],
+    "notes": "",
+    "monitor": false
+  },
+  "uid": "e5422468-c989-4852-98d2-51e743129daf",
   "name": "Through the glass",
   "preset": "glass",
   "objects": [
@@ -30,7 +36,8 @@
       "aperture": 2.7,
       "spread": 0,
       "width": 3,
-      "height": 2
+      "height": 2,
+      "aimDistance": 0
     },
     {
       "id": "o2",
@@ -99,12 +106,18 @@
     "density": 1,
     "normals": false,
     "grid": true,
-    "animate": false,
+    "animate": true,
     "labels": false,
     "foci": true,
     "glow": false,
     "extensions": false,
     "snap": false,
+    "hideStands": false,
+    "background": "studio",
+    "incidentOpacity": 1,
+    "spotCentroids": true,
+    "spotRms": false,
+    "analysisSourceId": null,
     "starMode": false,
     "mmPerUnit": 50,
     "primaryId": null,

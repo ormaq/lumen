@@ -1,0 +1,87 @@
+PASS First launch opens a full-window native dialog
+PASS The launch screen has an accessible title
+PASS Startup does not save an unchosen default over the recovery store
+PASS One editor toolbar; no separate Star lab screen or button
+PASS The six featured scenes are real ray-traced previews
+PASS Reduced motion is respected on first launch
+PASS First-launch Escape does not expose an unchosen project
+PASS Help is accessible from the first-launch screen
+PASS Closing help leaves the launch menu intact
+PASS Preview comparison has a real original parabola
+PASS Preview correction has a real analytic shaped mirror
+PASS Preview solving never changes the current project or editor camera
+PASS binary live preview loads with traced rays
+PASS splitter live preview loads with traced rays
+PASS rgb live preview loads with traced rays
+PASS glass live preview loads with traced rays
+PASS relay live preview loads with traced rays
+PASS inverse live preview loads with traced rays
+PASS Live preview animates real WebGL frames
+PASS Pausing the preview stops its rendering loop
+PASS Preview orbit does not move the editor camera
+PASS All 14 nonempty experiments are discoverable
+PASS The experiment library search filters live choices
+PASS Empty demo searches explain the result
+PASS A telescope opens in the normal editor, not in a separate mode
+PASS The integrated double-star scene records both source spots
+PASS All detector tools are available in the ordinary Analysis panel
+PASS Star example starts with an optional pinned detector monitor
+PASS Hidden launch previews stop rendering
+PASS Detector source filter isolates Star B statistics
+PASS Analysis filtering never removes the other source from the trace
+PASS Pinned monitor follows the analysis source filter
+PASS Filtered CSV includes every and only selected-source hit
+PASS Spot plots expand into a live analysis dialog
+PASS Detector PNG export creates a full resolution plotted image
+PASS The detector monitor can be unpinned
+PASS The detector monitor can be pinned again
+PASS RMS circles and centroid overlay controls persist independently
+PASS Physical scale is available in the same Analysis panel
+PASS Editing a star in Object updates the pinned monitor live
+PASS Every detector inspector links directly to its analysis
+PASS Project names and notes are editable and escaped
+PASS Whitespace-only project names are rejected
+PASS Named camera views are stored with the project
+PASS Orthographic camera controls remain available
+PASS A saved view restores target, zoom, orbit and projection
+PASS Command search opens from the viewport shortcut
+PASS Command search finds ordinary distant-star components
+PASS Running a command adds a star to the existing scene
+PASS Command-driven component additions are undoable
+PASS Saved camera views are searchable commands
+PASS Command search has an accessible empty state
+PASS Presentation controls work independently of telescope mode
+PASS The logo returns to the launch screen without changing the project
+PASS The current project appears in the local recent list
+PASS Browsing demos while a project is open preserves that project
+PASS Back to project restores editing without replacing the scene
+PASS Project JSON includes notes, camera views, monitor and analysis options
+PASS New blank project truly has no sources, mirrors or detectors
+PASS Blank projects open the component library instead of a special mode
+PASS Switching projects preserves both recovery entries
+PASS Opening a recent project recovers notes, named views, filters and camera
+PASS Returning users can skip the launch screen and recover their project
+PASS Re-enabling the launch preference restores the start screen
+PASS Fresh sessions offer recent project recovery instead of a misleading Back button
+PASS Removing recovery copies requires confirmation
+PASS Cancel keeps the recovery entry
+PASS Confirm removes only the chosen local copy
+PASS Beam splitters use the unified detector Analysis panel
+PASS The analysis can switch between non-stellar detectors
+PASS Scenes without detectors get useful add-component actions
+PASS Adding a detector from empty Analysis preserves the optical scene
+PASS Inverse design still solves the actual mirror after integration
+PASS Inverse shaping remains undoable
+PASS Reopening a demo creates a fresh project identity
+PASS The earlier demo project remains recoverable
+PASS Invalid imports never replace an open project
+PASS Denied browser storage does not prevent editing
+PASS Mobile launch is full-width and has no horizontal overflow
+PASS A telescope opens in the mobile normal workspace
+PASS Mobile Analyze opens the ordinary Analysis drawer
+PASS The live monitor expands on touch screens
+PASS Mobile blank choice contains no preloaded objects
+PASS Mobile editor retains a single top toolbar and no page overflow
+PASS No runtime network assets were requested
+PASS No uncaught JavaScript errors across the browser checks
+PASS 86 browser checks

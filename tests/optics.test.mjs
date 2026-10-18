@@ -1,364 +1,43 @@
-import { test } from 'node:test';
-import assert from 'node:assert/strict';
-import {
-  V,
-  rad,
-  basis,
-  localVec,
-  worldVec,
-  reflect,
-  refract,
-  fresnel,
-  quadratic,
-  intersect,
-  emit,
-  CATALOG,
-  isSource,
-  createObject,
-  createPreset,
-  PRESETS,
-  traceScene,
-  focalPoints,
-  validateScene,
-  wavelengthRGB,
-  sourceColor,
-  aim,
-  boundaryDistance,
-} from '../src/optics.js';
-const close = (a, b, eps = 1e-8) => assert.ok(Math.abs(a - b) < eps, `${a} ≠ ${b}`),
-  vecClose = (a, b, eps = 1e-8) => a.forEach((v, i) => close(v, b[i], eps));
-const empty = () => createPreset('empty');
-test('18 usable component types, including eight sources', () => {
-  assert.equal(Object.keys(CATALOG).length, 18);
-  assert.equal(Object.keys(CATALOG).filter((type) => isSource({ type })).length, 8);
-  for (const type of Object.keys(CATALOG)) assert.equal(createObject(type).type, type);
-});
-test('Orthonormal, right-handed bases at arbitrary 3D rotations', () => {
-  for (let i = 0; i < 100; i++) {
-    const b = basis({ yaw: i * 37, tilt: i * 19, roll: i * 41 });
-    close(V.len(b.u), 1);
-    close(V.len(b.v), 1);
-    close(V.len(b.n), 1);
-    close(V.dot(b.u, b.n), 0);
-    vecClose(V.cross(b.u, b.v), b.n);
-    const p = [i * 0.1, 1.5, -2];
-    vecClose(worldVec(localVec(p, b), b), p);
-  }
-});
-test('Stable linear, quadratic, tangent and no-root intersections', () => {
-  assert.deepEqual(quadratic(0, 2, -4), [2]);
-  assert.deepEqual(quadratic(1, -3, 2), [1, 2]);
-  assert.deepEqual(quadratic(1, 0, 1), []);
-  close(quadratic(1, 0, 0)[0], 0);
-  close(quadratic(1, 1e8, 1)[1], -1e-8, 1e-15);
-});
-test('Reflection normalizes and obeys equal angles in 3D', () => {
-  for (let i = 1; i < 100; i++) {
-    const d = V.unit([Math.sin(i), Math.cos(i * 0.37), -0.6]),
-      n = V.unit([0.2, 0.3, 1]),
-      r = reflect(d, n);
-    close(V.len(r), 1);
-    close(V.dot(d, n), -V.dot(r, n));
-    vecClose(reflect(r, n), d);
-  }
-});
-test('Finite, two-sided plane bounds and parallel misses', () => {
-  const o = { ...createObject('mirror'), p: [0, 0, 0], yaw: 0, width: 2, height: 2 };
-  close(intersect([0, 0, 3], [0, 0, -1], o).t, 3);
-  close(intersect([0, 0, -3], [0, 0, 1], o).t, 3);
-  assert.equal(intersect([2, 0, 3], [0, 0, -1], o), null);
-  assert.equal(intersect([0, 0, 1], [1, 0, 0], o), null);
-});
-test('Every paraboloid sample reflects through the exact focus', () => {
-  const scene = createPreset('focus'),
-    trace = traceScene(scene),
-    focus = focalPoints(scene.objects[1])[0];
-  assert.equal(trace.hits.length, 37);
-  for (const h of trace.hits) {
-    close(V.len(V.cross(V.sub(focus, h.point), h.outgoing)), 0, 1e-10);
-    assert.ok(V.dot(V.sub(focus, h.point), h.outgoing) > 0);
-    close(h.incidence, h.reflection, 1e-5);
-  }
-});
-test('Analytical paraboloid works with arbitrary yaw, tilt and roll', () => {
-  const m = { ...createObject('parabola'), p: [-2, 5, 4], yaw: 34, tilt: 47, roll: 28 },
-    b = basis(m),
-    f = focalPoints(m)[0];
-  for (const xy of [
-    [0, 0],
-    [0.7, 1],
-    [-1, 1.3],
-    [2, 0],
-  ]) {
-    const p = V.add(m.p, worldVec([...xy, 10], b)),
-      h = intersect(p, V.mul(b.n, -1), m);
-    assert.ok(h);
-    const d = reflect(V.mul(b.n, -1), h.normal);
-    close(V.len(V.cross(V.sub(f, h.point), d)), 0, 1e-9);
-  }
-});
-test('Paraboloid aperture clips rays beyond its physical rim', () => {
-  const m = { ...createObject('parabola'), p: [0, 0, 0], yaw: 0, diameter: 4 };
-  assert.equal(intersect([2.01, 0, 10], [0, 0, -1], m), null);
-  assert.ok(intersect([1.99, 0, 10], [0, 0, -1], m));
-});
-test('Parabolic collimator turns a focus source into a parallel beam', () => {
-  const t = traceScene(createPreset('collimator'));
-  assert.equal(t.hits.length, 61);
-  for (const h of t.hits) vecClose(h.outgoing, [-1, 0, 0]);
-});
-test('Trough has a line focus, not a false point focus', () => {
-  const s = createPreset('trough'),
-    t = traceScene(s),
-    m = s.objects[1],
-    b = basis(m);
-  for (const h of t.hits) {
-    const p = localVec(V.sub(h.point, m.p), b),
-      d = localVec(h.outgoing, b);
-    close(d[1], 0);
-    const tau = (m.focalLength - p[2]) / d[2];
-    close(p[0] + d[0] * tau, 0, 1e-8);
-    close(p[1] + d[1] * tau, p[1]);
-  }
-});
-test('Spherical cap rejects the opposite half of the sphere', () => {
-  const m = { ...createObject('spherical'), p: [0, 0, 0], yaw: 0, radius: 6, diameter: 5 };
-  const h = intersect([0, 0, 20], [0, 0, -1], m);
-  close(h.point[2], 0);
-});
-test('Spherical aberration is real, not an ideal point-focus approximation', () => {
-  const s = createPreset('spherical'),
-    t = traceScene(s),
-    f = focalPoints(s.objects[1])[0];
-  assert.ok(Math.max(...t.hits.map((h) => V.len(V.cross(V.sub(f, h.point), h.outgoing)))) > 0.02);
-});
-test('Convex spherical mirror diverges incoming parallel rays', () => {
-  const m = { ...createObject('spherical'), p: [0, 0, 0], yaw: 0, curvature: 'convex' },
-    h = intersect([1, 0, 10], [0, 0, -1], m),
-    r = reflect([0, 0, -1], h.normal);
-  assert.ok(r[0] > 0 && r[2] > 0);
-  assert.ok(focalPoints(m)[0][2] < 0);
-});
-test('All source types produce finite unit directions and conserve source power', () => {
-  for (const type of Object.keys(CATALOG).filter((type) => isSource({ type }))) {
-    const s = { ...createObject(type), count: 73, power: 2.3 },
-      rays = emit(s);
-    assert.equal(rays.length, type === 'laser' ? 1 : 73);
-    close(
-      rays.reduce((n, r) => n + r.energy, 0),
-      2.3,
-    );
-    for (const r of rays) {
-      close(V.len(r.d), 1);
-      assert.ok([...r.p, ...r.d, ...r.color].every(Number.isFinite));
-    }
-  }
-});
-test('Point source covers both hemispheres in true 3D', () => {
-  const r = emit(createObject('point'));
-  for (let i = 0; i < 3; i++) {
-    assert.ok(r.some((r) => r.d[i] > 0.5));
-    assert.ok(r.some((r) => r.d[i] < -0.5));
-  }
-});
-test('Fan source stays in its rolled emission plane', () => {
-  const s = { ...createObject('fan'), yaw: 42, tilt: 31, roll: 68 },
-    b = basis(s);
-  for (const r of emit(s)) close(V.dot(r.d, b.v), 0);
-});
-test('Spot rays stay inside their specified solid-angle cone', () => {
-  const s = { ...createObject('spot'), spread: 33 },
-    n = basis(s).n;
-  for (const r of emit(s)) assert.ok(V.dot(r.d, n) >= Math.cos(rad(33)) - 1e-10);
-});
-test('Ray density scales count but not total emitted power', () => {
-  const s = createObject('beam');
-  close(
-    emit(s, 0.5).reduce((n, r) => n + r.energy, 0),
-    1,
-  );
-  assert.equal(emit(s, 2).length, s.count * 2);
-  assert.equal(emit(createObject('laser'), 2).length, 1);
-});
-test('RGB and wavelength colors remain source-specific', () => {
-  const s = { ...createObject('beam'), color: '#80c7ff' },
-    r = emit(s);
-  vecClose(r[0].color, [128 / 255, 199 / 255, 1]);
-  for (const w of [380, 450, 510, 590, 700, 780])
-    assert.ok(wavelengthRGB(w).every((v) => Number.isFinite(v) && v >= 0 && v <= 1));
-});
-test('A 50:50 splitter conserves power in both detector branches', () => {
-  const t = traceScene(createPreset('splitter'));
-  assert.equal(t.seeds, 13);
-  close(t.detectors.o3.power, 0.5);
-  close(t.detectors.o4.power, 0.5);
-  assert.equal(t.detectors.o3.count, 13);
-  assert.equal(t.detectors.o4.count, 13);
-});
-test('Splitter endpoints of 0 and 1 create no phantom branch', () => {
-  for (const ratio of [0, 1]) {
-    const s = createPreset('splitter');
-    s.objects[1].ratio = ratio;
-    const t = traceScene(s);
-    close(t.detectors.o3.power, 1 - ratio);
-    close(t.detectors.o4.power, ratio);
-    assert.equal(t.segments.length, 26);
-  }
-});
-test('Detector power does not change when source sampling density changes', () => {
-  const s = createPreset('splitter');
-  s.settings.density = 2;
-  const t = traceScene(s);
-  close(t.detectors.o3.power, 0.5);
-  close(t.detectors.o4.power, 0.5);
-});
-test('Pass-through detector continues rays while absorbing detector stops them', () => {
-  const s = empty();
-  s.objects = [
-    createObject('laser', 'o1', [-5, 3, 0]),
-    createObject('detector', 'o2', [0, 3, 0]),
-    createObject('detector', 'o3', [4, 3, 0]),
-  ];
-  s.objects[1].absorb = false;
-  let t = traceScene(s);
-  close(t.detectors.o2.power, 1);
-  close(t.detectors.o3.power, 1);
-  s.objects[1].absorb = true;
-  t = traceScene(s);
-  close(t.detectors.o3.power, 0);
-});
-test('Blockers absorb; apertures transmit only through the actual opening', () => {
-  const s = empty();
-  s.objects = [createObject('laser', 'o1', [-5, 3, 0]), createObject('aperture', 'o2', [0, 3, 0])];
-  let t = traceScene(s);
-  assert.equal(t.hits.length, 0);
-  s.objects[0].p[1] = 4;
-  t = traceScene(s);
-  assert.equal(t.hits.length, 1);
-  assert.equal(t.segments.length, 1);
-  s.objects[1].type = 'blocker';
-  s.objects[0].p[1] = 3;
-  assert.equal(traceScene(s).hits.length, 1);
-});
-test('Ideal converging lens focuses collimated rays at the paraxial focus', () => {
-  const s = createPreset('lens'),
-    t = traceScene(s),
-    m = s.objects[1],
-    f = [3, 3, 0];
-  for (const h of t.hits.filter((h) => h.type === 'lens'))
-    close(V.len(V.cross(V.sub(f, h.point), h.outgoing)), 0, 1e-8);
-});
-test('Negative thin-lens focal length diverges light', () => {
-  const s = createPreset('lens');
-  s.objects[1].focalLength = -3;
-  const t = traceScene(s),
-    b = basis(s.objects[1]);
-  const h = t.hits.find((h) => h.type === 'lens' && Math.abs(h.local[0]) > 0.3);
-  assert.ok(localVec(h.outgoing, b)[0] * h.local[0] > 0);
-});
-test('Snell refraction matches the sine law', () => {
-  const angle = rad(40),
-    d = [Math.sin(angle), 0, -Math.cos(angle)],
-    t = refract(d, [0, 0, 1], 1 / 1.5);
-  close(Math.abs(t[0]) * 1.5, Math.sin(angle));
-  close(V.len(t), 1);
-});
-test('Total internal reflection returns no transmitted ray', () => {
-  assert.equal(refract([Math.sin(rad(60)), 0, -Math.cos(rad(60))], [0, 0, 1], 1.5), null);
-});
-test('Unpolarized Fresnel coefficient is 4% for air/glass at normal incidence', () => {
-  close(fresnel(1, 1, 1.5), 0.04);
-  close(fresnel(Math.cos(rad(60)), 1.5, 1), 1);
-});
-test('Glass sphere has correct entrance and exit intersections', () => {
-  const m = { ...createObject('glass'), p: [0, 0, 0], radius: 2 };
-  close(intersect([-4, 0, 0], [1, 0, 0], m).t, 2);
-  close(intersect([0, 0, 0], [1, 0, 0], m).t, 2);
-});
-test('Refraction through both sphere faces reaches the detector', () => {
-  const t = traceScene(createPreset('glass'));
-  assert.equal(t.hits.filter((h) => h.type === 'glass').length, 98);
-  close(t.detectors.o3.power, 1);
-});
-test('Fresnel branching and total internal reflection work in the tracer', () => {
-  const s = empty();
-  s.objects = [
-    createObject('laser', 'o1', [-5, 3, 0]),
-    { ...createObject('glass', 'o2', [0, 3, 0]), fresnel: true },
-  ];
-  let t = traceScene(s);
-  assert.ok(t.segments.some((s) => s.kind === 'reflected'));
-  close(
-    t.segments.filter((s) => s.terminal).reduce((n, s) => n + s.energy, 0) + t.prunedPower,
-    1,
-    1e-7,
-  );
-  s.objects[0].p = [0, 3, 1.5];
-  s.objects[1].radius = 1.6;
-  t = traceScene(s);
-  assert.ok(t.hits.some((h) => h.tir));
-});
-test('Three-dimensional mirror relay records three reflections per ray', () => {
-  const t = traceScene(createPreset('relay'));
-  assert.equal(t.hits.length, 21);
-  assert.equal(t.hits.filter((h) => h.rayIndex === 0).length, 3);
-});
-test('Disabled components and zero-power sources do not participate', () => {
-  const s = createPreset('focus');
-  s.objects[1].enabled = false;
-  assert.equal(traceScene(s).hits.length, 0);
-  s.objects[0].power = 0;
-  assert.equal(traceScene(s).seeds, 0);
-});
-test('Ray path and segment budget limits are enforced', () => {
-  const s = createPreset('focus');
-  s.settings.maxDistance = 5;
-  assert.equal(traceScene(s).hits.length, 0);
-  s.settings.segmentBudget = 10;
-  const t = traceScene(s);
-  assert.equal(t.segments.length, 10);
-  assert.ok(t.limited);
-});
-test('All presets round-trip through scene validation', () => {
-  for (const name of Object.keys(PRESETS)) {
-    const s = createPreset(name),
-      v = validateScene(JSON.parse(JSON.stringify(s)));
-    assert.equal(v.objects.length, s.objects.length);
-    assert.ok(
-      traceScene(v).segments.every((s) => [...s.a, ...s.b, s.energy].every(Number.isFinite)),
-    );
-  }
-});
-test('Validation rejects malformed data and bounds unsupported geometry', () => {
-  assert.throws(() => validateScene({ version: 2, objects: [{ type: 'unknown' }] }));
-  const s = createPreset('focus');
-  s.objects[0].p[0] = NaN;
-  assert.throws(() => validateScene(s));
-  const q = createPreset('spherical');
-  q.objects[1].radius = 1;
-  q.objects[1].diameter = 10;
-  assert.ok(validateScene(q).objects[1].diameter < 2);
-});
-test('Version 1 scenes migrate with their original source directions', () => {
-  const v1 = {
-    version: 1,
-    preset: 'relay',
-    source: { p: [-5, 2, 0], yaw: 30, pitch: 20, mode: 'beam', count: 7, aperture: 0.3, spread: 0 },
-    mirrors: [{ p: [0, 2, 0], yaw: 45, tilt: 0, width: 3, height: 3, reflectivity: 0.9 }],
-    settings: { maxBounces: 10 },
-  };
-  const v = validateScene(v1);
-  assert.equal(v.version, 3);
-  assert.equal(v.objects.length, 2);
-  vecClose(basis(v.objects[0]).n, [
-    Math.cos(rad(30)) * Math.cos(rad(20)),
-    Math.sin(rad(20)),
-    Math.sin(rad(30)) * Math.cos(rad(20)),
-  ]);
-});
-test('Aiming a source and world-boundary exits are consistent', () => {
-  const s = createObject('laser');
-  aim(s, [4, 6, -1]);
-  vecClose(basis(s).n, V.unit(V.sub([4, 6, -1], s.p)));
-  close(boundaryDistance([0, 0, 0], [1, 0, 0]), 22);
-});
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {V,rad,basis,localVec,worldVec,reflect,refract,fresnel,quadratic,intersect,emit,CATALOG,isSource,createObject,createPreset,PRESETS,traceScene,focalPoints,validateScene,wavelengthRGB,sourceColor,aim,boundaryDistance} from '../src/optics.js';
+const close=(a,b,eps=1e-8)=>assert.ok(Math.abs(a-b)<eps,`${a} ≠ ${b}`),vecClose=(a,b,eps=1e-8)=>a.forEach((v,i)=>close(v,b[i],eps));
+const empty=()=>createPreset('empty');
+test('19 usable component types, including eight sources',()=>{assert.equal(Object.keys(CATALOG).length,19);assert.equal(Object.keys(CATALOG).filter(type=>isSource({type})).length,8);for(const type of Object.keys(CATALOG))assert.equal(createObject(type).type,type);});
+test('Orthonormal, right-handed bases at arbitrary 3D rotations',()=>{for(let i=0;i<100;i++){const b=basis({yaw:i*37,tilt:i*19,roll:i*41});close(V.len(b.u),1);close(V.len(b.v),1);close(V.len(b.n),1);close(V.dot(b.u,b.n),0);vecClose(V.cross(b.u,b.v),b.n);const p=[i*.1,1.5,-2];vecClose(worldVec(localVec(p,b),b),p);}});
+test('Stable linear, quadratic, tangent and no-root intersections',()=>{assert.deepEqual(quadratic(0,2,-4),[2]);assert.deepEqual(quadratic(1,-3,2),[1,2]);assert.deepEqual(quadratic(1,0,1),[]);close(quadratic(1,0,0)[0],0);close(quadratic(1,1e8,1)[1],-1e-8,1e-15);});
+test('Reflection normalizes and obeys equal angles in 3D',()=>{for(let i=1;i<100;i++){const d=V.unit([Math.sin(i),Math.cos(i*.37),-.6]),n=V.unit([.2,.3,1]),r=reflect(d,n);close(V.len(r),1);close(V.dot(d,n),-V.dot(r,n));vecClose(reflect(r,n),d);}});
+test('Finite, two-sided plane bounds and parallel misses',()=>{const o={...createObject('mirror'),p:[0,0,0],yaw:0,width:2,height:2};close(intersect([0,0,3],[0,0,-1],o).t,3);close(intersect([0,0,-3],[0,0,1],o).t,3);assert.equal(intersect([2,0,3],[0,0,-1],o),null);assert.equal(intersect([0,0,1],[1,0,0],o),null);});
+test('Every paraboloid sample reflects through the exact focus',()=>{const scene=createPreset('focus'),trace=traceScene(scene),focus=focalPoints(scene.objects[1])[0];assert.equal(trace.hits.length,37);for(const h of trace.hits){close(V.len(V.cross(V.sub(focus,h.point),h.outgoing)),0,1e-10);assert.ok(V.dot(V.sub(focus,h.point),h.outgoing)>0);close(h.incidence,h.reflection,1e-5);}});
+test('Analytical paraboloid works with arbitrary yaw, tilt and roll',()=>{const m={...createObject('parabola'),p:[-2,5,4],yaw:34,tilt:47,roll:28},b=basis(m),f=focalPoints(m)[0];for(const xy of [[0,0],[.7,1],[-1,1.3],[2,0]]){const p=V.add(m.p,worldVec([...xy,10],b)),h=intersect(p,V.mul(b.n,-1),m);assert.ok(h);const d=reflect(V.mul(b.n,-1),h.normal);close(V.len(V.cross(V.sub(f,h.point),d)),0,1e-9);}});
+test('Paraboloid aperture clips rays beyond its physical rim',()=>{const m={...createObject('parabola'),p:[0,0,0],yaw:0,diameter:4};assert.equal(intersect([2.01,0,10],[0,0,-1],m),null);assert.ok(intersect([1.99,0,10],[0,0,-1],m));});
+test('Parabolic collimator turns a focus source into a parallel beam',()=>{const t=traceScene(createPreset('collimator'));assert.equal(t.hits.length,61);for(const h of t.hits)vecClose(h.outgoing,[-1,0,0]);});
+test('Trough has a line focus, not a false point focus',()=>{const s=createPreset('trough'),t=traceScene(s),m=s.objects[1],b=basis(m);for(const h of t.hits){const p=localVec(V.sub(h.point,m.p),b),d=localVec(h.outgoing,b);close(d[1],0);const tau=(m.focalLength-p[2])/d[2];close(p[0]+d[0]*tau,0,1e-8);close(p[1]+d[1]*tau,p[1]);}});
+test('Spherical cap rejects the opposite half of the sphere',()=>{const m={...createObject('spherical'),p:[0,0,0],yaw:0,radius:6,diameter:5};const h=intersect([0,0,20],[0,0,-1],m);close(h.point[2],0);});
+test('Spherical aberration is real, not an ideal point-focus approximation',()=>{const s=createPreset('spherical'),t=traceScene(s),f=focalPoints(s.objects[1])[0];assert.ok(Math.max(...t.hits.map(h=>V.len(V.cross(V.sub(f,h.point),h.outgoing))))>.02);});
+test('Convex spherical mirror diverges incoming parallel rays',()=>{const m={...createObject('spherical'),p:[0,0,0],yaw:0,curvature:'convex'},h=intersect([1,0,10],[0,0,-1],m),r=reflect([0,0,-1],h.normal);assert.ok(r[0]>0&&r[2]>0);assert.ok(focalPoints(m)[0][2]<0);});
+test('All source types produce finite unit directions and conserve source power',()=>{for(const type of Object.keys(CATALOG).filter(type=>isSource({type}))){const s={...createObject(type),count:73,power:2.3},rays=emit(s);assert.equal(rays.length,type==='laser'?1:73);close(rays.reduce((n,r)=>n+r.energy,0),2.3);for(const r of rays){close(V.len(r.d),1);assert.ok([...r.p,...r.d,...r.color].every(Number.isFinite));}}});
+test('Point source covers both hemispheres in true 3D',()=>{const r=emit(createObject('point'));for(let i=0;i<3;i++){assert.ok(r.some(r=>r.d[i]>.5));assert.ok(r.some(r=>r.d[i]<-.5));}});
+test('Fan source stays in its rolled emission plane',()=>{const s={...createObject('fan'),yaw:42,tilt:31,roll:68},b=basis(s);for(const r of emit(s))close(V.dot(r.d,b.v),0);});
+test('Spot rays stay inside their specified solid-angle cone',()=>{const s={...createObject('spot'),spread:33},n=basis(s).n;for(const r of emit(s))assert.ok(V.dot(r.d,n)>=Math.cos(rad(33))-1e-10);});
+test('Ray density scales count but not total emitted power',()=>{const s=createObject('beam');close(emit(s,.5).reduce((n,r)=>n+r.energy,0),1);assert.equal(emit(s,2).length,s.count*2);assert.equal(emit(createObject('laser'),2).length,1);});
+test('RGB and wavelength colors remain source-specific',()=>{const s={...createObject('beam'),color:'#80c7ff'},r=emit(s);vecClose(r[0].color,[128/255,199/255,1]);for(const w of [380,450,510,590,700,780])assert.ok(wavelengthRGB(w).every(v=>Number.isFinite(v)&&v>=0&&v<=1));});
+test('A 50:50 splitter conserves power in both detector branches',()=>{const t=traceScene(createPreset('splitter'));assert.equal(t.seeds,13);close(t.detectors.o3.power,.5);close(t.detectors.o4.power,.5);assert.equal(t.detectors.o3.count,13);assert.equal(t.detectors.o4.count,13);});
+test('Splitter endpoints of 0 and 1 create no phantom branch',()=>{for(const ratio of [0,1]){const s=createPreset('splitter');s.objects[1].ratio=ratio;const t=traceScene(s);close(t.detectors.o3.power,1-ratio);close(t.detectors.o4.power,ratio);assert.equal(t.segments.length,26);}});
+test('Detector power does not change when source sampling density changes',()=>{const s=createPreset('splitter');s.settings.density=2;const t=traceScene(s);close(t.detectors.o3.power,.5);close(t.detectors.o4.power,.5);});
+test('Pass-through detector continues rays while absorbing detector stops them',()=>{const s=empty();s.objects=[createObject('laser','o1',[-5,3,0]),createObject('detector','o2',[0,3,0]),createObject('detector','o3',[4,3,0])];s.objects[1].absorb=false;let t=traceScene(s);close(t.detectors.o2.power,1);close(t.detectors.o3.power,1);s.objects[1].absorb=true;t=traceScene(s);close(t.detectors.o3.power,0);});
+test('Blockers absorb; apertures transmit only through the actual opening',()=>{const s=empty();s.objects=[createObject('laser','o1',[-5,3,0]),createObject('aperture','o2',[0,3,0])];let t=traceScene(s);assert.equal(t.hits.length,0);s.objects[0].p[1]=4;t=traceScene(s);assert.equal(t.hits.length,1);assert.equal(t.segments.length,1);s.objects[1].type='blocker';s.objects[0].p[1]=3;assert.equal(traceScene(s).hits.length,1);});
+test('Ideal converging lens focuses collimated rays at the paraxial focus',()=>{const s=createPreset('lens'),t=traceScene(s),m=s.objects[1],f=[3,3,0];for(const h of t.hits.filter(h=>h.type==='lens'))close(V.len(V.cross(V.sub(f,h.point),h.outgoing)),0,1e-8);});
+test('Negative thin-lens focal length diverges light',()=>{const s=createPreset('lens');s.objects[1].focalLength=-3;const t=traceScene(s),b=basis(s.objects[1]);const h=t.hits.find(h=>h.type==='lens'&&Math.abs(h.local[0])>.3);assert.ok(localVec(h.outgoing,b)[0]*h.local[0]>0);});
+test('Snell refraction matches the sine law',()=>{const angle=rad(40),d=[Math.sin(angle),0,-Math.cos(angle)],t=refract(d,[0,0,1],1/1.5);close(Math.abs(t[0])*1.5,Math.sin(angle));close(V.len(t),1);});
+test('Total internal reflection returns no transmitted ray',()=>{assert.equal(refract([Math.sin(rad(60)),0,-Math.cos(rad(60))],[0,0,1],1.5),null);});
+test('Unpolarized Fresnel coefficient is 4% for air/glass at normal incidence',()=>{close(fresnel(1,1,1.5),.04);close(fresnel(Math.cos(rad(60)),1.5,1),1);});
+test('Glass sphere has correct entrance and exit intersections',()=>{const m={...createObject('glass'),p:[0,0,0],radius:2};close(intersect([-4,0,0],[1,0,0],m).t,2);close(intersect([0,0,0],[1,0,0],m).t,2);});
+test('Refraction through both sphere faces reaches the detector',()=>{const t=traceScene(createPreset('glass'));assert.equal(t.hits.filter(h=>h.type==='glass').length,98);close(t.detectors.o3.power,1);});
+test('Fresnel branching and total internal reflection work in the tracer',()=>{const s=empty();s.objects=[createObject('laser','o1',[-5,3,0]),{...createObject('glass','o2',[0,3,0]),fresnel:true}];let t=traceScene(s);assert.ok(t.segments.some(s=>s.kind==='reflected'));close(t.segments.filter(s=>s.terminal).reduce((n,s)=>n+s.energy,0)+t.prunedPower,1,1e-7);s.objects[0].p=[0,3,1.5];s.objects[1].radius=1.6;t=traceScene(s);assert.ok(t.hits.some(h=>h.tir));});
+test('Three-dimensional mirror relay records three reflections per ray',()=>{const t=traceScene(createPreset('relay'));assert.equal(t.hits.length,21);assert.equal(t.hits.filter(h=>h.rayIndex===0).length,3);});
+test('Disabled components and zero-power sources do not participate',()=>{const s=createPreset('focus');s.objects[1].enabled=false;assert.equal(traceScene(s).hits.length,0);s.objects[0].power=0;assert.equal(traceScene(s).seeds,0);});
+test('Ray path and segment budget limits are enforced',()=>{const s=createPreset('focus');s.settings.maxDistance=5;assert.equal(traceScene(s).hits.length,0);s.settings.segmentBudget=10;const t=traceScene(s);assert.equal(t.segments.length,10);assert.ok(t.limited);});
+test('All presets round-trip through scene validation',()=>{for(const name of Object.keys(PRESETS)){const s=createPreset(name),v=validateScene(JSON.parse(JSON.stringify(s)));assert.equal(v.objects.length,s.objects.length);assert.ok(traceScene(v).segments.every(s=>[...s.a,...s.b,s.energy].every(Number.isFinite)));}});
+test('Validation rejects malformed data and bounds unsupported geometry',()=>{assert.throws(()=>validateScene({version:2,objects:[{type:'unknown'}]}));const s=createPreset('focus');s.objects[0].p[0]=NaN;assert.throws(()=>validateScene(s));const q=createPreset('spherical');q.objects[1].radius=1;q.objects[1].diameter=10;assert.ok(validateScene(q).objects[1].diameter<2);});
+test('Version 1 scenes migrate with their original source directions',()=>{const v1={version:1,preset:'relay',source:{p:[-5,2,0],yaw:30,pitch:20,mode:'beam',count:7,aperture:.3,spread:0},mirrors:[{p:[0,2,0],yaw:45,tilt:0,width:3,height:3,reflectivity:.9}],settings:{maxBounces:10}};const v=validateScene(v1);assert.equal(v.version,5);assert.equal(v.objects.length,2);vecClose(basis(v.objects[0]).n,[Math.cos(rad(30))*Math.cos(rad(20)),Math.sin(rad(20)),Math.sin(rad(30))*Math.cos(rad(20))]);});
+test('Aiming a source and world-boundary exits are consistent',()=>{const s=createObject('laser');aim(s,[4,6,-1]);vecClose(basis(s).n,V.unit(V.sub([4,6,-1],s.p)));close(boundaryDistance([0,0,0],[1,0,0]),22);});

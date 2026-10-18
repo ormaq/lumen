@@ -1,0 +1,170 @@
+"""Lumen 5 browser integration. Run with xvfb-run -a python tests/browser_studio_v5.py.
+A Storage-compatible in-memory implementation tests deterministic recovery flows.
+The test environment blocks file/http navigation; HTML is injected, with real WebGL.
+"""
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+import json,csv,io,os
+from PIL import Image
+ROOT=Path(__file__).resolve().parents[1]
+HTML=(ROOT/'lumen-3d-v5.html').read_text(encoding='utf-8')
+passed=[];errors=[];network=[]
+def check(name,ok):
+ assert ok,name
+ passed.append(name);print('PASS',name,flush=True)
+def wait(p):
+ p.bring_to_front()
+ p.wait_for_function('window.Lumen && !Lumen.getStats().pending',timeout=45000);p.wait_for_timeout(170)
+def scene(p):return p.evaluate('Lumen.getScene()')
+def welcome(p):return p.evaluate('Lumen.getWelcome()')
+def key(p,k):p.locator('#canvas').focus();p.keyboard.press(k);wait(p)
+def show(p,selector):
+ loc=p.locator(selector)
+ for d in loc.locator('xpath=ancestor::details').all():
+  if not d.evaluate('(e)=>e.open'):d.locator('summary').first.click()
+ loc.scroll_into_view_if_needed();return loc
+def menu(p,label):
+ l=p.locator('header.topbar .menu > summary').filter(has_text=label)
+ if not l.locator('..').evaluate('(d)=>d.open'):l.click()
+def select(p,id):
+ if p.evaluate('document.body.classList.contains("left-hidden")'):p.locator('#left-toggle').click()
+ p.locator('[data-left-tab="scene"]').click();p.locator(f'#object-list [data-select="{id}"]').click();p.locator('[data-right-tab="object"]').click();wait(p)
+def change(p,prop,v):
+ loc=show(p,f'#inspector input[type="number"][data-prop="{prop}"]');loc.fill(str(v));loc.press('Enter');wait(p)
+def load(p,name):
+ s=p.evaluate('(n)=>Lumen.kernel.createPreset(n)',name)
+ p.locator('#scene-file').set_input_files({'name':'test.json','mimeType':'application/json','buffer':json.dumps(s).encode()});wait(p);return s
+
+def page(ctx,entries=None,mock=True):
+ p=ctx.new_page();p.on('pageerror',lambda e:(errors.append(str(e)),print('ERROR',e,flush=True)));p.on('request',lambda r:network.append(r.url))
+ if mock:p.evaluate('''entries=>{window.__storage=new Map(Object.entries(entries||{}));const st={getItem:k=>window.__storage.get(String(k))??null,setItem:(k,v)=>window.__storage.set(String(k),String(v)),removeItem:k=>window.__storage.delete(String(k)),clear:()=>window.__storage.clear(),key:i=>Array.from(window.__storage.keys())[i]||null,get length(){return window.__storage.size;}};Object.defineProperty(window,'localStorage',{configurable:true,value:st});}''',entries or {})
+ p.set_content(HTML,wait_until='load');wait(p);return p
+with sync_playwright() as pw:
+ b=pw.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH','/usr/bin/chromium'),headless=os.environ.get('HEADLESS')=='1',args=['--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader'])
+ ctx=b.new_context(viewport={'width':1512,'height':980},accept_downloads=True,reduced_motion='reduce')
+ p=page(ctx)
+ check('First launch opens a full-window native dialog',welcome(p)['open'] and p.locator('#home-dialog').bounding_box()=={'x':0,'y':0,'width':1512,'height':980})
+ check('The launch screen has an accessible title',p.locator('#home-title').count()==1 and p.locator('#home-title').inner_text().startswith('Good ideas'))
+ check('Startup does not save an unchosen default over the recovery store',p.evaluate('localStorage.getItem("lumen-projects-v5")') is None)
+ check('One editor toolbar; no separate Star lab screen or button',p.locator('header.topbar').count()==1 and p.locator('#star-dialog,#star-lab-button,#star-menu-button').count()==0)
+ check('The six featured scenes are real ray-traced previews',p.locator('#home-demo-list [data-demo]').count()==6 and welcome(p)['rays']>0 and not welcome(p)['error'])
+ check('Reduced motion is respected on first launch',not welcome(p)['motion'])
+ initial=scene(p);camera=p.evaluate('Lumen.getCamera()')
+ p.keyboard.press('Escape');check('First-launch Escape does not expose an unchosen project',welcome(p)['open'])
+ p.locator('#home-help').click();check('Help is accessible from the first-launch screen',p.locator('#guide-dialog').is_visible());p.keyboard.press('Escape');check('Closing help leaves the launch menu intact',welcome(p)['open'])
+ p.locator('#preview-original').click();p.wait_for_timeout(180)
+ check('Preview comparison has a real original parabola',p.evaluate('Lumen.getDemo().objects[1].type')=='parabola')
+ p.locator('#preview-corrected').click();p.wait_for_timeout(180)
+ check('Preview correction has a real analytic shaped mirror',p.evaluate('Lumen.getDemo().objects[1].type')=='shaped')
+ check('Preview solving never changes the current project or editor camera',scene(p)==initial and p.evaluate('Lumen.getCamera()')==camera)
+ for name in ['binary','splitter','rgb','glass','relay','inverse']:
+  p.locator(f'[data-demo="{name}"]').click();p.wait_for_timeout(230)
+  check(f'{name} live preview loads with traced rays',welcome(p)['demo']==name and welcome(p)['rays']>0 and not welcome(p)['error'])
+ p.locator('#preview-motion').click();f=welcome(p)['frames'];p.wait_for_timeout(750)
+ check('Live preview animates real WebGL frames',welcome(p)['motion'] and welcome(p)['frames']>f+3)
+ p.locator('#preview-motion').click();p.wait_for_timeout(180);f=welcome(p)['frames'];p.wait_for_timeout(550)
+ check('Pausing the preview stops its rendering loop',not welcome(p)['motion'] and welcome(p)['frames']==f)
+ old=p.evaluate('Lumen.getCamera()');r=p.locator('#home-canvas').bounding_box();p.mouse.move(r['x']+r['width']*.6,r['y']+r['height']*.45);p.mouse.down();p.mouse.move(r['x']+r['width']*.6+70,r['y']+r['height']*.45+20,steps=6);p.mouse.up();p.wait_for_timeout(150)
+ check('Preview orbit does not move the editor camera',p.evaluate('Lumen.getCamera()')==old)
+ p.locator('#home-all-demos').click();check('All 14 nonempty experiments are discoverable',p.locator('[data-demo]').count()==14)
+ p.locator('#home-search').fill('star');check('The experiment library search filters live choices',p.locator('[data-demo]').count()==4)
+ p.locator('#home-search').fill('no such experiment');check('Empty demo searches explain the result',p.locator('#home-demo-list').inner_text().startswith('No experiments'))
+ p.locator('#home-all-demos').click();p.locator('[data-demo="binary"]').click();p.locator('#home-launch').click();wait(p)
+ check('A telescope opens in the normal editor, not in a separate mode',not welcome(p)['open'] and scene(p)['preset']=='binary' and 'TELESCOPE WORKSPACE' not in p.locator('#view-caption').inner_text())
+ check('The integrated double-star scene records both source spots',p.evaluate('Lumen.getTrace().detectors.o3.count')==1536)
+ check('All detector tools are available in the ordinary Analysis panel',p.locator('#research-map').is_visible() and p.locator('#research-hit-count').inner_text()=='1,536')
+ check('Star example starts with an optional pinned detector monitor',p.locator('#detector-monitor').is_visible())
+ f=welcome(p)['frames'];p.wait_for_timeout(600);check('Hidden launch previews stop rendering',not welcome(p)['previewActive'] and welcome(p)['frames']==f)
+ originalTrace=p.evaluate('Lumen.getTrace().detectors.o3')
+ p.locator('[data-research="analysisSourceId"]').select_option('o4');wait(p)
+ check('Detector source filter isolates Star B statistics',p.locator('#research-hit-count').inner_text()=='768' and 'Star B' in p.locator('#spot-legend').inner_text() and 'Star A' not in p.locator('#spot-legend').inner_text())
+ check('Analysis filtering never removes the other source from the trace',p.evaluate('Lumen.getTrace().detectors.o3')==originalTrace)
+ check('Pinned monitor follows the analysis source filter','768 samples' in p.locator('#monitor-summary').inner_text())
+ with p.expect_download() as down:p.locator('#research-export').click()
+ rows=list(csv.DictReader(io.StringIO(Path(down.value.path()).read_text())))
+ check('Filtered CSV includes every and only selected-source hit',len(rows)==768 and {r['source'] for r in rows}=={'Star B'})
+ p.locator('#analysis-expand').click();wait(p);check('Spot plots expand into a live analysis dialog',p.locator('#analysis-dialog').is_visible() and 'Star B' in p.locator('#expanded-subtitle').inner_text())
+ with p.expect_download() as down:p.locator('#analysis-png').click()
+ im=Image.open(down.value.path());check('Detector PNG export creates a full resolution plotted image',im.size==(1200,920) and im.getbbox() is not None)
+ p.locator('[data-close="analysis-dialog"]').click();p.locator('#analysis-pin').click();wait(p);check('The detector monitor can be unpinned',not p.locator('#detector-monitor').is_visible())
+ p.locator('#analysis-pin').click();wait(p);check('The detector monitor can be pinned again',p.locator('#detector-monitor').is_visible())
+ show(p,'[data-research="spotRms"]').check();wait(p);show(p,'[data-research="spotCentroids"]').uncheck();wait(p)
+ check('RMS circles and centroid overlay controls persist independently',scene(p)['settings']['spotRms'] and not scene(p)['settings']['spotCentroids'])
+ show(p,'#research-world-scale').fill('100');p.locator('#research-world-scale').press('Tab');wait(p)
+ check('Physical scale is available in the same Analysis panel',scene(p)['settings']['mmPerUnit']==100)
+ select(p,'o4');before=p.evaluate('Lumen.kernel.spotStatistics(Lumen.getTrace().detectors.o3.hits.filter(h=>h.sourceId==="o4")).centroid')
+ change(p,'fieldX',.25);after=p.evaluate('Lumen.kernel.spotStatistics(Lumen.getTrace().detectors.o3.hits.filter(h=>h.sourceId==="o4")).centroid')
+ check('Editing a star in Object updates the pinned monitor live',p.locator('#inspector').is_visible() and p.locator('#detector-monitor').is_visible() and before!=after)
+ select(p,'o3');p.locator('#detector-analyze').click();wait(p);check('Every detector inspector links directly to its analysis',p.locator('#research-map').is_visible() and scene(p)['settings']['detectorId']=='o3')
+ p.locator('#project-name').click();p.locator('#project-title-input').fill('Binary <bench>');p.locator('#project-notes-input').fill('Field X = 0.25°. Compare Star A and Star B.');p.locator('#project-form button[type="submit"]').click();wait(p)
+ check('Project names and notes are editable and escaped',scene(p)['name']=='Binary <bench>' and p.locator('#project-name').inner_text()=='Binary <bench>' and p.locator('#project-name bench').count()==0 and scene(p)['workspace']['notes'].startswith('Field X'))
+ p.locator('#project-name').click();p.locator('#project-title-input').fill('  ');p.locator('#project-form button[type="submit"]').click();check('Whitespace-only project names are rejected',p.locator('#project-dialog').is_visible() and scene(p)['name']=='Binary <bench>');p.locator('#project-dialog [data-close]').first.click()
+ menu(p,'View');p.locator('#save-camera').click();p.locator('#view-name-input').fill('Optical overview');p.locator('#view-name-form button[type="submit"]').click();wait(p)
+ check('Named camera views are stored with the project',len(scene(p)['workspace']['views'])==1 and scene(p)['workspace']['views'][0]['name']=='Optical overview')
+ savedcam=scene(p)['workspace']['views'][0]['camera'];key(p,'2');check('Orthographic camera controls remain available',p.evaluate('Lumen.getCamera().orthographic'))
+ menu(p,'View');p.locator('[data-camera-view="0"]').click();wait(p)
+ check('A saved view restores target, zoom, orbit and projection',p.evaluate('Lumen.getCamera()')==savedcam)
+ key(p,'Control+k');check('Command search opens from the viewport shortcut',p.locator('#command-dialog').is_visible())
+ p.locator('#command-search').fill('add distant star');check('Command search finds ordinary distant-star components',p.locator('.command-result').count()==1)
+ count=len(scene(p)['objects']);p.locator('#command-search').press('Enter');wait(p);check('Running a command adds a star to the existing scene',len(scene(p)['objects'])==count+1 and scene(p)['objects'][-1]['type']=='star')
+ key(p,'Control+z');check('Command-driven component additions are undoable',len(scene(p)['objects'])==count)
+ key(p,'Control+k');p.locator('#command-search').fill('optical overview');check('Saved camera views are searchable commands','Go to Optical overview' in p.locator('#command-results').inner_text());p.keyboard.press('Escape')
+ key(p,'Control+k');p.locator('#command-search').fill('xxxxxxxx');check('Command search has an accessible empty state','No matching tools' in p.locator('#command-results').inner_text());p.keyboard.press('Escape')
+ p.locator('[data-right-tab="simulation"]').click();show(p,'[data-setting="background"]').select_option('midnight');wait(p)
+ show(p,'input[type="number"][data-setting="incidentOpacity"]').fill('.2');p.locator('input[type="number"][data-setting="incidentOpacity"]').press('Tab');wait(p)
+ check('Presentation controls work independently of telescope mode',scene(p)['settings']['background']=='midnight' and scene(p)['settings']['incidentOpacity']==.2)
+ p.locator('#home-button').click();wait(p);check('The logo returns to the launch screen without changing the project',welcome(p)['open'] and scene(p)['name']=='Binary <bench>')
+ check('The current project appears in the local recent list','Binary <bench>' in p.locator('#home-recent-list').inner_text())
+ current=scene(p);currentcam=p.evaluate('Lumen.getCamera()');p.locator('[data-demo="rgb"]').click();p.locator('[data-demo="glass"]').click();check('Browsing demos while a project is open preserves that project',scene(p)==current and p.evaluate('Lumen.getCamera()')==currentcam)
+ p.locator('#home-back').click();wait(p);check('Back to project restores editing without replacing the scene',not welcome(p)['open'] and scene(p)['name']=='Binary <bench>')
+ with p.expect_download() as down:key(p,'Control+s')
+ exported=json.loads(Path(down.value.path()).read_text());check('Project JSON includes notes, camera views, monitor and analysis options',exported['version']==5 and exported['workspace']['notes'].startswith('Field X') and len(exported['workspace']['views'])==1 and exported['settings']['analysisSourceId']=='o4')
+ p.locator('#home-button').click();p.locator('#home-blank').click();wait(p)
+ check('New blank project truly has no sources, mirrors or detectors',len(scene(p)['objects'])==0 and p.locator('#empty-stage').is_visible())
+ check('Blank projects open the component library instead of a special mode',p.locator('#library-panel').is_visible())
+ p.locator('#home-button').click();wait(p);check('Switching projects preserves both recovery entries',p.locator('[data-recover]').count()==2)
+ uid=current['uid'];p.locator(f'[data-recover="{uid}"]').click();wait(p)
+ check('Opening a recent project recovers notes, named views, filters and camera',scene(p)['workspace']['notes']==current['workspace']['notes'] and [(v['name'],v['camera']) for v in scene(p)['workspace']['views']]==[(v['name'],v['camera']) for v in current['workspace']['views']] and scene(p)['settings']['analysisSourceId']=='o4' and p.evaluate('Lumen.getCamera()')==currentcam)
+ p.locator('#home-button').click();p.locator('#home-on-launch').uncheck();entries=p.evaluate('Object.fromEntries(window.__storage)')
+ q=page(ctx,entries);check('Returning users can skip the launch screen and recover their project',not welcome(q)['open'] and scene(q)['name']=='Binary <bench>')
+ q.locator('#home-button').click();q.locator('#home-on-launch').check();entries2=q.evaluate('Object.fromEntries(window.__storage)')
+ q.close();q=page(ctx,entries2);check('Re-enabling the launch preference restores the start screen',welcome(q)['open'])
+ q.locator('#home-back').is_visible()
+ check('Fresh sessions offer recent project recovery instead of a misleading Back button',q.locator('#home-back').is_hidden() and q.locator('[data-recover]').count()==2)
+ first=q.locator('[data-forget]').first;uidremove=first.get_attribute('data-forget');first.click();check('Removing recovery copies requires confirmation',q.locator('#forget-dialog').is_visible());q.locator('[data-close="forget-dialog"]').click();check('Cancel keeps the recovery entry',q.locator(f'[data-recover="{uidremove}"]').count()==1)
+ q.locator(f'[data-forget="{uidremove}"]').click();q.locator('#forget-confirm').click();check('Confirm removes only the chosen local copy',q.locator(f'[data-recover="{uidremove}"]').count()==0 and q.locator('[data-recover]').count()==1)
+ q.close();p.locator('#home-back').click();wait(p)
+ # Ordinary, non-stellar detectors use exactly the same analysis.
+ load(p,'splitter');check('Beam splitters use the unified detector Analysis panel',p.locator('#research-map').is_visible() and p.locator('[data-research="detectorId"] option').count()==2)
+ p.locator('[data-research="detectorId"]').select_option('o4');wait(p);check('The analysis can switch between non-stellar detectors',p.locator('#research-hit-count').inner_text()=='13' and p.locator('#research-power').inner_text()=='0.500')
+ load(p,'focus');p.locator('#analysis-button').click();wait(p);check('Scenes without detectors get useful add-component actions',p.locator('#research-panel [data-add="detector"]').is_visible() and p.locator('#research-panel [data-add="star"]').is_visible())
+ p.locator('#research-panel [data-add="detector"]').click();wait(p);check('Adding a detector from empty Analysis preserves the optical scene',len(scene(p)['objects'])==3 and scene(p)['objects'][-1]['type']=='detector')
+ # Inverse shaping remains available as part of the same app.
+ load(p,'inverse');p.locator('#design-button').click();p.locator('#design-solve').click();wait(p);p.wait_for_timeout(900)
+ check('Inverse design still solves the actual mirror after integration',scene(p)['objects'][1]['type']=='shaped' and p.evaluate('Lumen.kernel.spotStatistics(Lumen.getTrace().detectors.o3.hits).rms')<1e-8)
+ key(p,'Control+z');check('Inverse shaping remains undoable',scene(p)['objects'][1]['type']=='parabola')
+ # Opening the same demo twice makes two projects, not an accidental reset of one recovery entry.
+ p.locator('#home-button').click();p.locator('[data-demo="inverse"]').click();p.locator('#home-launch').click();wait(p);firstuid=scene(p)['uid']
+ p.locator('#home-button').click();p.locator('#home-launch').click();wait(p)
+ check('Reopening a demo creates a fresh project identity',scene(p)['uid']!=firstuid)
+ p.locator('#home-button').click();check('The earlier demo project remains recoverable',p.evaluate('(uid)=>JSON.parse(localStorage.getItem("lumen-projects-v5")).some(r=>r.scene.uid===uid)',firstuid));p.locator('#home-back').click();wait(p)
+ # Invalid imports keep the current project unchanged.
+ old=scene(p)
+ p.locator('#scene-file').set_input_files({'name':'bad.json','mimeType':'application/json','buffer':b'{bad json'});p.wait_for_timeout(250);check('Invalid imports never replace an open project',scene(p)==old)
+ # No-storage fallback uses the real opaque-origin behavior.
+ nostore=page(ctx,mock=False);nostore.locator('#home-blank').click();wait(nostore);nostore.wait_for_timeout(750);check('Denied browser storage does not prevent editing','Local storage unavailable' in nostore.locator('#save-status').inner_text());nostore.close()
+ # Mobile launch and normal workspace behavior.
+ mobilectx=b.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,device_scale_factor=1,reduced_motion='reduce')
+ m=page(mobilectx)
+ check('Mobile launch is full-width and has no horizontal overflow',m.evaluate('document.querySelector("#home-dialog").scrollWidth<=innerWidth') and m.locator('#home-dialog').bounding_box()['width']==390)
+ m.screenshot(path=str(ROOT/'preview-launch-mobile.png'),full_page=False)
+ m.locator('[data-demo="binary"]').tap();m.locator('#home-launch').tap();wait(m);check('A telescope opens in the mobile normal workspace',not welcome(m)['open'] and scene(m)['preset']=='binary')
+ m.locator('#analysis-button').tap();wait(m);check('Mobile Analyze opens the ordinary Analysis drawer',m.locator('#research-map').is_visible())
+ m.locator('#right-close').tap();m.locator('#monitor-expand').tap();wait(m);check('The live monitor expands on touch screens',m.locator('#analysis-dialog').is_visible());m.locator('[data-close="analysis-dialog"]').tap()
+ m.locator('#home-button').tap();m.locator('#home-blank').tap();wait(m);check('Mobile blank choice contains no preloaded objects',len(scene(m)['objects'])==0)
+ check('Mobile editor retains a single top toolbar and no page overflow',m.locator('header.topbar').count()==1 and m.evaluate('document.documentElement.scrollWidth<=innerWidth && document.documentElement.scrollHeight===innerHeight'))
+ check('No runtime network assets were requested',not any(u.startswith(('https:','http:')) for u in network))
+ check('No uncaught JavaScript errors across the browser checks',not errors)
+ (ROOT/'tests'/'browser-results-studio-v5.json').write_text(json.dumps({'passed':len(passed),'checks':passed,'errors':errors,'network':network,'storage_testing':'Storage-compatible memory model; no-storage path also tested'},indent=2))
+ m.close();mobilectx.close();p.close();ctx.close();b.close()
+print(f'PASS {len(passed)} browser checks',flush=True)
